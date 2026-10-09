@@ -1,0 +1,15 @@
+[build]
+  command = "npm run docs:build"
+  publish = "docs/.vitepress/dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[dev]
+  command = "npm run docs:dev"
+  targetPort = 5173
+  port = 8888
+  framework = "#custom"
+
+# VitePress prerenders each route. Netlify Pretty URLs serves the matching
+# HTML file; do not rewrite missing articles or private routes to the homepage.

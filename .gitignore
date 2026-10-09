@@ -1,0 +1,17 @@
+node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+.env
+.env.*
+!.env.example
+# Original personal materials are not website assets.
+person/
+*.pem
+*.key
+*.p12
+*.pfx
+*.bak
+.DS_Store
+*.log
+.vercel
+.netlify/

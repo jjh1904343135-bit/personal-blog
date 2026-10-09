@@ -1,0 +1,64 @@
+locale: zh_Hans
+backend:
+  name: proxy
+  proxy_url: __AUTHOR_ORIGIN__/api/v1
+  branch: main
+
+media_folder: docs/public/images
+public_folder: /images
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: algorithms
+    label: 算法
+    label_singular: 算法文章
+    folder: docs/algorithms
+    create: true
+    filter: { field: isIndex, value: false }
+    fields: &article_fields
+      - { label: 标题, name: title, widget: string }
+      - { label: 文章摘要, name: description, widget: text, hint: 用一两句话告诉读者能解决什么问题 }
+      - { label: 发布日期, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+      - { label: 所属分类, name: category, widget: select, options: [算法, Agent, 面经, 部署, 系统, 后端] }
+      - { label: 标签, name: tags, widget: list, required: false }
+      - { label: 阅读时长, name: readingTime, widget: string, default: 约 8 分钟 }
+      - { label: 索引页标记, name: isIndex, widget: hidden, default: false }
+      - { label: 正文, name: body, widget: markdown }
+  - name: agent
+    label: Agent
+    label_singular: Agent 文章
+    folder: docs/agent
+    create: true
+    filter: { field: isIndex, value: false }
+    fields: *article_fields
+  - name: interviews
+    label: 面经
+    label_singular: 面经文章
+    folder: docs/interviews
+    create: true
+    filter: { field: isIndex, value: false }
+    fields: *article_fields
+  - name: deployment
+    label: 部署
+    label_singular: 部署文章
+    folder: docs/deployment
+    create: true
+    filter: { field: isIndex, value: false }
+    fields: *article_fields
+  - name: systems
+    label: 系统
+    label_singular: 系统文章
+    folder: docs/systems
+    create: true
+    filter: { field: isIndex, value: false }
+    fields: *article_fields
+  - name: backend
+    label: 后端
+    label_singular: 后端文章
+    folder: docs/backend
+    create: true
+    filter: { field: isIndex, value: false }
+    fields: *article_fields

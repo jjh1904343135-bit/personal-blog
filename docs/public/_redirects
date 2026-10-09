@@ -1,0 +1,6 @@
+# The writing server is local-only and never exposed by the public deployment.
+/admin /404.html 404!
+/admin/* /404.html 404!
+/private/* /404.html 404!
+/api/* /404.html 404!
+/.env /404.html 404!
