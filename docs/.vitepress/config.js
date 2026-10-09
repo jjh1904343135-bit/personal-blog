@@ -23,6 +23,29 @@ export default defineConfig({
       }
     },
     plugins: [
+      {
+        name: 'protect-private-local-files',
+        configureServer(server) {
+          // Raw imports are transformed before static-file deny checks in some
+          // Vite versions. Reject private paths before either middleware runs.
+          server.middlewares.use((req, res, next) => {
+            let pathname = (req.url || '/').split('?')[0]
+            try {
+              for (let i = 0; i < 3; i++) {
+                const decoded = decodeURIComponent(pathname)
+                if (decoded === pathname) break
+                pathname = decoded
+              }
+            } catch { res.statusCode = 400; return res.end('Invalid path') }
+            pathname = pathname.replace(/\\/g, '/').toLowerCase()
+            if (/(?:^|\/)(?:\.env[^/]*|\.git|private|person|scripts)(?:\/|$)/.test(pathname)) {
+              res.statusCode = 403
+              return res.end('Private local files are not served')
+            }
+            next()
+          })
+        }
+      },
       compression({ algorithm: 'gzip', threshold: 1024 }),
       compression({ algorithm: 'brotliCompress', filename: '[path][base].br', threshold: 1024 })
     ]

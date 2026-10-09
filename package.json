@@ -4,19 +4,29 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "docs:dev": "vitepress dev docs --host 0.0.0.0",
+    "docs:dev": "vitepress dev docs --host 127.0.0.1",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs --host 0.0.0.0",
+    "docs:preview": "vitepress preview docs --host 127.0.0.1",
     "admin": "node scripts/author-server.js",
+    "write": "node scripts/author-server.js --sync",
+    "sync": "node scripts/sync-content.js",
+    "sync:watch": "node scripts/sync-content.js --watch",
+    "test": "node --test scripts/*.test.js",
     "gen-img": "node scripts/generate-image.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^15.0.2",
     "vitepress": "^1.6.4"
   },
   "devDependencies": {
     "decap-server": "^3.3.1",
     "vite-plugin-compression2": "^1.3.3"
+  },
+  "overrides": {
+    "vitepress": { "vite": "6.4.4" },
+    "decap-server": { "simple-git": "4.0.2" }
   },
   "engines": {
     "node": ">=20"

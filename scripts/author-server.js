@@ -3,8 +3,10 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readFile } from 'node:fs/promises'
+import { readFile, lstat } from 'node:fs/promises'
 import { categories } from '../docs/categories.js'
+import { createContentPublisher, startContentWatch } from './content-sync.js'
+import { registerManagement } from './management-api.js'
 
 // Use the Express version bundled with the installed Decap proxy.
 const require = createRequire(import.meta.url)
@@ -34,6 +36,7 @@ app.use((req, res, next) => {
   res.set('X-Robots-Tag', 'noindex, nofollow')
   res.set('X-Content-Type-Options', 'nosniff')
   res.set('X-Frame-Options', 'DENY')
+  res.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'")
   if (!hosts.has(req.headers.host)) return res.sendStatus(403)
   if (req.headers.origin && !origins.has(req.headers.origin)) return res.sendStatus(403)
   if (req.headers['sec-fetch-site'] === 'cross-site') return res.sendStatus(403)
@@ -50,6 +53,22 @@ app.use((req, res, next) => {
 app.get(['/', '/admin', '/admin/', '/admin/index.html'], (_req, res) => {
   res.type('html').sendFile(path.join(privateRoot, 'index.html'))
 })
+for (const file of ['admin.css', 'admin.js']) app.get(`/admin/${file}`, (_req, res) => res.sendFile(path.join(privateRoot, file)))
+app.get('/admin/avatar.webp', (_req, res) => res.sendFile(path.join(root, 'docs/public/images/okzu-avatar.webp')))
+const autoSync = process.argv.includes('--sync')
+let contentWatcher, manualJob, manualController
+let syncState = { automatic: autoSync, phase: 'idle', message: autoSync ? '自动同步已开启，保存后等待 30 秒。' : '仅本机保存，自动同步未开启。', logs: [] }
+function updateSync(update) {
+  syncState = { ...syncState, ...update }
+  if (update.phase !== 'waiting') syncState.logs = [...syncState.logs, { time: new Date().toISOString(), message: update.message }].slice(-12)
+}
+const publisher = createContentPublisher({ root, onStatus: updateSync })
+registerManagement(app, { root, express, username, getSyncState: () => syncState, syncNow: () => {
+  if (manualJob || ['checking', 'building', 'pushing'].includes(syncState.phase)) return false
+  manualController = new AbortController()
+  manualJob = publisher.sync({ signal: manualController.signal }).catch(() => {}).finally(() => { manualJob = null; manualController = null })
+  return true
+} })
 app.get(['/config.yml', '/admin/config.yml'], async (_req, res, next) => {
   try {
     const config = await readFile(path.join(privateRoot, 'config.yml'), 'utf8')
@@ -78,11 +97,24 @@ function validPaths(value, mutating) {
   }
   return true
 }
-app.post('/api/v1', (req, res, next) => {
+app.post('/api/v1', async (req, res, next) => {
   const action = req.body?.action
   const mutating = ['persistEntry', 'persistMedia', 'deleteFile', 'deleteFiles'].includes(action)
   if (!allowedActions.has(action) || !validPaths(req.body?.params, mutating)) return res.status(403).json({ error: '只允许访问博客文章和图片目录。' })
-  next()
+  try {
+    const paths = []
+    function collect(value) { if (!value || typeof value !== 'object') return; for (const [key, child] of Object.entries(value)) { if (['path','newPath','folder','mediaFolder'].includes(key)) paths.push(child); else if (key === 'paths') paths.push(...child); else collect(child) } }
+    collect(req.body?.params)
+    for (const file of paths) {
+      let cursor = root
+      for (const part of file.split('/')) {
+        cursor = path.join(cursor, part)
+        try { if ((await lstat(cursor)).isSymbolicLink()) return res.status(403).json({ error: '不允许访问符号链接。' }) }
+        catch (e) { if (e.code === 'ENOENT') break; throw e }
+      }
+    }
+    next()
+  } catch (e) { next(e) }
 })
 
 // Force Decap to use this repository and this authenticated, same-origin API.
@@ -97,10 +129,16 @@ const server = app.listen(port, '127.0.0.1', () => {
   console.log(`账号：${username}`)
   if (!configuredPassword) console.log(`本次临时密码：${password}`)
   console.log('仅本机可访问。密码验证同时保护页面、配置和保存接口。')
-  console.log('保存写入 docs/ 下的 Markdown；上线需重新构建部署。\n')
+  console.log(autoSync ? '自动公开已启用：保存的文章及配图将自动提交，由 Netlify 构建上线。\n' : '仅本机保存；npm run write 可开启自动公开发布。\n')
+  if (autoSync) contentWatcher = startContentWatch(publisher, { onStatus: updateSync })
 })
 server.on('error', error => {
   console.error(error.code === 'EADDRINUSE' ? `端口 ${port} 被占用，请停止旧写作后台或修改 AUTHOR_PORT。` : error.message)
   process.exitCode = 1
 })
-for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close(() => process.exit(0)))
+for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, async () => {
+  await contentWatcher?.stop()
+  manualController?.abort()
+  await manualJob
+  server.close(() => process.exit(0))
+})

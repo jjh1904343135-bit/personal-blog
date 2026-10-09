@@ -1,0 +1,436 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-09T13:27:44.114Z",
+  "title": "Design System: ok俎的个人博客",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "深蓝画布",
+        "tonalRamp": [
+          "oklch(15% 0.0193 262.08)",
+          "oklch(25% 0.0193 262.08)",
+          "oklch(35% 0.0193 262.08)",
+          "oklch(45% 0.0193 262.08)",
+          "oklch(55% 0.0193 262.08)",
+          "oklch(65% 0.0193 262.08)",
+          "oklch(80% 0.0193 262.08)",
+          "oklch(95% 0.0193 262.08)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "深蓝面板",
+        "tonalRamp": [
+          "oklch(15% 0.0267 262.58)",
+          "oklch(25% 0.0267 262.58)",
+          "oklch(35% 0.0267 262.58)",
+          "oklch(45% 0.0267 262.58)",
+          "oklch(55% 0.0267 262.58)",
+          "oklch(65% 0.0267 262.58)",
+          "oklch(80% 0.0267 262.58)",
+          "oklch(95% 0.0267 262.58)"
+        ]
+      },
+      "soft": {
+        "role": "neutral",
+        "displayName": "公开柔和层",
+        "tonalRamp": [
+          "oklch(15% 0.0301 260.51)",
+          "oklch(25% 0.0301 260.51)",
+          "oklch(35% 0.0301 260.51)",
+          "oklch(45% 0.0301 260.51)",
+          "oklch(55% 0.0301 260.51)",
+          "oklch(65% 0.0301 260.51)",
+          "oklch(80% 0.0301 260.51)",
+          "oklch(95% 0.0301 260.51)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "暖白正文",
+        "tonalRamp": [
+          "oklch(15% 0.0070 88.64)",
+          "oklch(25% 0.0070 88.64)",
+          "oklch(35% 0.0070 88.64)",
+          "oklch(45% 0.0070 88.64)",
+          "oklch(55% 0.0070 88.64)",
+          "oklch(65% 0.0070 88.64)",
+          "oklch(80% 0.0070 88.64)",
+          "oklch(95% 0.0070 88.64)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "灰蓝辅助文字",
+        "tonalRamp": [
+          "oklch(15% 0.0210 257.48)",
+          "oklch(25% 0.0210 257.48)",
+          "oklch(35% 0.0210 257.48)",
+          "oklch(45% 0.0210 257.48)",
+          "oklch(55% 0.0210 257.48)",
+          "oklch(65% 0.0210 257.48)",
+          "oklch(80% 0.0210 257.48)",
+          "oklch(95% 0.0210 257.48)"
+        ]
+      },
+      "blue": {
+        "role": "primary",
+        "displayName": "操作蓝",
+        "tonalRamp": [
+          "oklch(15% 0.1319 266.98)",
+          "oklch(25% 0.1319 266.98)",
+          "oklch(35% 0.1319 266.98)",
+          "oklch(45% 0.1319 266.98)",
+          "oklch(55% 0.1319 266.98)",
+          "oklch(65% 0.1319 266.98)",
+          "oklch(80% 0.1319 266.98)",
+          "oklch(95% 0.1319 266.98)"
+        ]
+      },
+      "blue-hover-public": {
+        "role": "primary",
+        "displayName": "公开按钮悬停蓝",
+        "tonalRamp": [
+          "oklch(15% 0.0994 268.35)",
+          "oklch(25% 0.0994 268.35)",
+          "oklch(35% 0.0994 268.35)",
+          "oklch(45% 0.0994 268.35)",
+          "oklch(55% 0.0994 268.35)",
+          "oklch(65% 0.0994 268.35)",
+          "oklch(80% 0.0994 268.35)",
+          "oklch(95% 0.0994 268.35)"
+        ]
+      },
+      "blue-hover-private": {
+        "role": "primary",
+        "displayName": "私有按钮悬停蓝",
+        "tonalRamp": [
+          "oklch(15% 0.1027 268.15)",
+          "oklch(25% 0.1027 268.15)",
+          "oklch(35% 0.1027 268.15)",
+          "oklch(45% 0.1027 268.15)",
+          "oklch(55% 0.1027 268.15)",
+          "oklch(65% 0.1027 268.15)",
+          "oklch(80% 0.1027 268.15)",
+          "oklch(95% 0.1027 268.15)"
+        ]
+      },
+      "mint": {
+        "role": "secondary",
+        "displayName": "薄荷",
+        "tonalRamp": [
+          "oklch(15% 0.0799 184.45)",
+          "oklch(25% 0.0799 184.45)",
+          "oklch(35% 0.0799 184.45)",
+          "oklch(45% 0.0799 184.45)",
+          "oklch(55% 0.0799 184.45)",
+          "oklch(65% 0.0799 184.45)",
+          "oklch(80% 0.0799 184.45)",
+          "oklch(95% 0.0799 184.45)"
+        ]
+      },
+      "coral-public": {
+        "role": "tertiary",
+        "displayName": "公开珊瑚",
+        "tonalRamp": [
+          "oklch(15% 0.1573 25.26)",
+          "oklch(25% 0.1573 25.26)",
+          "oklch(35% 0.1573 25.26)",
+          "oklch(45% 0.1573 25.26)",
+          "oklch(55% 0.1573 25.26)",
+          "oklch(65% 0.1573 25.26)",
+          "oklch(80% 0.1573 25.26)",
+          "oklch(95% 0.1573 25.26)"
+        ]
+      },
+      "action-ink": {
+        "role": "neutral",
+        "displayName": "按钮深色字",
+        "tonalRamp": [
+          "oklch(15% 0.0318 264.66)",
+          "oklch(25% 0.0318 264.66)",
+          "oklch(35% 0.0318 264.66)",
+          "oklch(45% 0.0318 264.66)",
+          "oklch(55% 0.0318 264.66)",
+          "oklch(65% 0.0318 264.66)",
+          "oklch(80% 0.0318 264.66)",
+          "oklch(95% 0.0318 264.66)"
+        ]
+      },
+      "divider-public": {
+        "role": "neutral",
+        "displayName": "公开透明分隔线",
+        "tonalRamp": [
+          "oklch(15% 0.0167 259.42)",
+          "oklch(25% 0.0167 259.42)",
+          "oklch(35% 0.0167 259.42)",
+          "oklch(45% 0.0167 259.42)",
+          "oklch(55% 0.0167 259.42)",
+          "oklch(65% 0.0167 259.42)",
+          "oklch(80% 0.0167 259.42)",
+          "oklch(95% 0.0167 259.42)"
+        ]
+      },
+      "input-private": {
+        "role": "neutral",
+        "displayName": "私有输入底色",
+        "tonalRamp": [
+          "oklch(15% 0.0225 257.29)",
+          "oklch(25% 0.0225 257.29)",
+          "oklch(35% 0.0225 257.29)",
+          "oklch(45% 0.0225 257.29)",
+          "oklch(55% 0.0225 257.29)",
+          "oklch(65% 0.0225 257.29)",
+          "oklch(80% 0.0225 257.29)",
+          "oklch(95% 0.0225 257.29)"
+        ]
+      },
+      "line-private": {
+        "role": "neutral",
+        "displayName": "私有分隔线",
+        "tonalRamp": [
+          "oklch(15% 0.0318 255.72)",
+          "oklch(25% 0.0318 255.72)",
+          "oklch(35% 0.0318 255.72)",
+          "oklch(45% 0.0318 255.72)",
+          "oklch(55% 0.0318 255.72)",
+          "oklch(65% 0.0318 255.72)",
+          "oklch(80% 0.0318 255.72)",
+          "oklch(95% 0.0318 255.72)"
+        ]
+      },
+      "selected-private": {
+        "role": "neutral",
+        "displayName": "私有选中背景",
+        "tonalRamp": [
+          "oklch(15% 0.0545 260.05)",
+          "oklch(25% 0.0545 260.05)",
+          "oklch(35% 0.0545 260.05)",
+          "oklch(45% 0.0545 260.05)",
+          "oklch(55% 0.0545 260.05)",
+          "oklch(65% 0.0545 260.05)",
+          "oklch(80% 0.0545 260.05)",
+          "oklch(95% 0.0545 260.05)"
+        ]
+      },
+      "selected-ink-private": {
+        "role": "neutral",
+        "displayName": "私有选中文字",
+        "tonalRamp": [
+          "oklch(15% 0.0650 269.67)",
+          "oklch(25% 0.0650 269.67)",
+          "oklch(35% 0.0650 269.67)",
+          "oklch(45% 0.0650 269.67)",
+          "oklch(55% 0.0650 269.67)",
+          "oklch(65% 0.0650 269.67)",
+          "oklch(80% 0.0650 269.67)",
+          "oklch(95% 0.0650 269.67)"
+        ]
+      },
+      "danger-private": {
+        "role": "tertiary",
+        "displayName": "私有危险红",
+        "tonalRamp": [
+          "oklch(15% 0.1203 19.01)",
+          "oklch(25% 0.1203 19.01)",
+          "oklch(35% 0.1203 19.01)",
+          "oklch(45% 0.1203 19.01)",
+          "oklch(55% 0.1203 19.01)",
+          "oklch(65% 0.1203 19.01)",
+          "oklch(80% 0.1203 19.01)",
+          "oklch(95% 0.1203 19.01)"
+        ]
+      },
+      "danger-hover-private": {
+        "role": "tertiary",
+        "displayName": "私有危险悬停红",
+        "tonalRamp": [
+          "oklch(15% 0.1408 18.26)",
+          "oklch(25% 0.1408 18.26)",
+          "oklch(35% 0.1408 18.26)",
+          "oklch(45% 0.1408 18.26)",
+          "oklch(55% 0.1408 18.26)",
+          "oklch(65% 0.1408 18.26)",
+          "oklch(80% 0.1408 18.26)",
+          "oklch(95% 0.1408 18.26)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display-public": {
+        "displayName": "公开首页展示",
+        "purpose": "现有首页主标题；不应用于后台。"
+      },
+      "body-public": {
+        "displayName": "公开阅读正文",
+        "purpose": "文章阅读的字号与行距。"
+      },
+      "title-private": {
+        "displayName": "私有页面标题",
+        "purpose": "管理视图的系统字体标题。"
+      },
+      "markdown-private": {
+        "displayName": "私有 Markdown",
+        "purpose": "正文编辑器的等宽字体和行距。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "search-public",
+        "value": "0 24px 70px rgba(0, 0, 0, .3)",
+        "purpose": "公开搜索浮层。"
+      },
+      {
+        "name": "dialog-private",
+        "value": "0 16px 50px #0005",
+        "purpose": "私有删除确认对话框。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-public",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "公开首页动作、导航及卡片状态；私有界面不继承过渡。"
+      },
+      {
+        "name": "duration-public",
+        "value": ".2s",
+        "purpose": "公开交互状态过渡；reduced-motion 时缩减。"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "public-navigation-and-grid",
+        "value": "1080px"
+      },
+      {
+        "name": "public-mobile",
+        "value": "760px"
+      },
+      {
+        "name": "private-single-pane",
+        "value": "1100px"
+      },
+      {
+        "name": "private-mobile",
+        "value": "720px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "公开主动作",
+      "kind": "button",
+      "refersTo": "button-primary-public",
+      "description": "公开首页宽松尺度的主链接。",
+      "html": "<a class=\"ds-public-primary\" href=\"#knowledge-topics\">浏览六个栏目 <svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><path d=\"M6 16h20m-7-7 7 7-7 7\"/></svg></a>",
+      "css": ".ds-public-primary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 20px;border-radius:12px;font:700 15px var(--vp-font-family-base,Manrope,\"Noto Sans SC\",sans-serif);color:var(--blog-ink,#111827);background:var(--blog-accent,#86a8ff);text-decoration:none;transition:background .2s var(--blog-ease,cubic-bezier(.16,1,.3,1)),transform .2s var(--blog-ease,cubic-bezier(.16,1,.3,1))}.ds-public-primary svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ds-public-primary:hover{background:#a3bcff}.ds-public-primary:focus-visible{outline:3px solid #a8bfff;outline-offset:5px}.ds-public-primary:active{transform:translateY(1px)}@media(prefers-reduced-motion:reduce){.ds-public-primary{transition:none}}"
+    },
+    {
+      "name": "公开栏目卡",
+      "kind": "card",
+      "refersTo": "card-public",
+      "description": "公开栏目入口保留较大圆角、贴纸和交互边界。",
+      "html": "<a class=\"ds-public-card\" href=\"/algorithms/\"><span class=\"ds-public-sticker\"><svg viewBox=\"0 0 32 32\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"8\" height=\"8\" rx=\"2\"/><rect x=\"21\" y=\"21\" width=\"8\" height=\"8\" rx=\"2\"/><path d=\"M11 7h10a4 4 0 0 1 4 4v10M7 11v10a4 4 0 0 0 4 4h10M17 3l4 4-4 4M3 17l4 4 4-4\"/></svg></span><h3>算法</h3></a>",
+      "css": ".ds-public-card{display:flex;flex-direction:column;min-height:254px;padding:24px;border:1px solid var(--vp-c-divider,rgba(223,230,241,.14));border-radius:var(--blog-radius,16px);color:var(--vp-c-text-1,#f6f4ef);background:var(--blog-panel,#1c2330);text-decoration:none;font-family:var(--vp-font-family-base,Manrope,\"Noto Sans SC\",sans-serif);transition:border-color .2s var(--blog-ease,cubic-bezier(.16,1,.3,1)),background .2s var(--blog-ease,cubic-bezier(.16,1,.3,1))}.ds-public-card:hover{border-color:var(--blog-accent,#86a8ff);background:#232d3d}.ds-public-card:focus-visible{outline:3px solid #a8bfff;outline-offset:5px}.ds-public-card:active{background:#2b3649}.ds-public-card h3{margin:20px 0 10px;font-size:1.75rem;font-weight:700;letter-spacing:-.02em}.ds-public-sticker{display:grid;place-items:center;width:48px;height:44px;border:3px solid #eef0f4;border-radius:13px;color:var(--blog-ink,#111827);background:var(--blog-accent,#86a8ff);transform:rotate(-7deg);transition:transform .2s var(--blog-ease,cubic-bezier(.16,1,.3,1))}.ds-public-sticker svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ds-public-card:hover .ds-public-sticker{transform:rotate(0)}@media(max-width:760px){.ds-public-card{min-height:224px;padding:20px}.ds-public-card h3{font-size:1.5rem}}@media(prefers-reduced-motion:reduce){.ds-public-card,.ds-public-sticker{transition:none}}"
+    },
+    {
+      "name": "私有主按钮",
+      "kind": "button",
+      "refersTo": "button-primary-private",
+      "description": "新建与保存的亮蓝主动作。",
+      "html": "<button class=\"ds-primary\" type=\"button\">保存到本机</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 16px;border-radius:8px;border:1px solid transparent;white-space:nowrap;font-size:.88rem;font-weight:600;cursor:pointer;font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;background:var(--blue,#86a8ff);color:#111827}.ds-primary:hover{background:#a0baff}.ds-primary:focus-visible{outline:3px solid var(--blue,#86a8ff);outline-offset:4px;}.ds-primary:disabled{cursor:wait;opacity:.55}@media(max-width:720px){.ds-primary{padding:10px 12px;font-size:.8rem}}"
+    },
+    {
+      "name": "私有次按钮",
+      "kind": "button",
+      "refersTo": "button-secondary-private",
+      "description": "返回、同步与复制等次动作。",
+      "html": "<button class=\"ds-secondary\" type=\"button\">立即同步</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 16px;border-radius:8px;border:1px solid transparent;white-space:nowrap;font-size:.88rem;font-weight:600;cursor:pointer;font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;background:transparent;border-color:var(--line,#354151);color:var(--ink,#f6f4ef)}.ds-secondary:hover{background:#263245}.ds-secondary:focus-visible{outline:3px solid var(--blue,#86a8ff);outline-offset:4px;}.ds-secondary:disabled{cursor:wait;opacity:.55}@media(max-width:720px){.ds-secondary{padding:10px 12px;font-size:.8rem}}"
+    },
+    {
+      "name": "私有危险按钮",
+      "kind": "button",
+      "refersTo": "button-danger-private",
+      "description": "确认对话框中的删除动作。",
+      "html": "<button class=\"ds-danger\" type=\"button\">确认删除</button>",
+      "css": ".ds-danger{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 16px;border-radius:8px;border:1px solid transparent;white-space:nowrap;font-size:.88rem;font-weight:600;cursor:pointer;font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;background:#872f36;color:#fff}.ds-danger:hover{background:#a63b45}.ds-danger:focus-visible{outline:3px solid var(--blue,#86a8ff);outline-offset:4px;}.ds-danger:disabled{cursor:wait;opacity:.55}"
+    },
+    {
+      "name": "私有输入字段",
+      "kind": "input",
+      "refersTo": "field-private",
+      "description": "可见中文标签、深色底与清晰键盘焦点。",
+      "html": "<label class=\"ds-label\">文章标题<input class=\"ds-input\" placeholder=\"这篇文章想解决什么问题？\"/></label>",
+      "css": ".ds-label{display:grid;gap:8px;font-size:.85rem;font-weight:500;color:var(--ink,#f6f4ef);font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;}.ds-input{font:inherit;color:var(--ink,#f6f4ef);background:var(--input,#121923);border:1px solid var(--line,#354151);border-radius:7px;padding:10px 12px;min-height:42px;caret-color:var(--blue,#86a8ff)}.ds-input::placeholder{color:#98a8bc;opacity:1}.ds-input:focus-visible{outline:3px solid var(--blue,#86a8ff);outline-offset:4px;}.ds-input:read-only{color:var(--muted,#b2bbc8)}"
+    },
+    {
+      "name": "私有导航",
+      "kind": "nav",
+      "refersTo": "nav-selected-private",
+      "description": "同一导航项用颜色和 aria-current 表示位置。",
+      "html": "<nav class=\"ds-nav\" aria-label=\"后台导航\"><button class=\"ds-nav-button ds-selected\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h5\"/></svg>文章管理</button><button class=\"ds-nav-button\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"3\"/><circle cx=\"8\" cy=\"8\" r=\"1.5\"/><path d=\"m4 18 5-6 4 4 3-3 5 5\"/></svg>配图管理</button></nav>",
+      "css": ".ds-nav{display:grid;gap:8px}.ds-nav-button{display:flex;align-items:center;gap:12px;background:transparent;border:0;color:var(--muted,#b2bbc8);padding:14px 12px;text-align:left;border-radius:8px;font-size:16px;cursor:pointer;font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;}.ds-nav-button:hover{background:#1c293a;color:var(--ink,#f6f4ef)}.ds-nav-button.ds-selected{background:#263753;color:#c2d2ff}.ds-nav-button:focus-visible{outline:3px solid var(--blue,#86a8ff);outline-offset:4px;}.ds-nav-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}@media(max-width:720px){.ds-nav{display:flex}.ds-nav-button{padding:10px 12px;min-height:42px}}"
+    },
+    {
+      "name": "私有内容标签",
+      "kind": "chip",
+      "refersTo": "tag-private",
+      "description": "被动内容元数据，不带操作选中态。",
+      "html": "<span class=\"ds-tag\">Agent</span>",
+      "css": ".ds-tag{display:inline-block;font-size:.73rem;border:1px solid #455268;border-radius:5px;padding:3px 6px;margin:2px 4px 2px 0;white-space:nowrap;color:#c1cbd9;font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;}"
+    },
+    {
+      "name": "私有元数据面板",
+      "kind": "card",
+      "refersTo": "container-private",
+      "description": "无阴影的表单分组；样例保留文章标题字段。",
+      "html": "<div class=\"ds-panel\"><label class=\"ds-panel-label\">文章标题<input class=\"ds-panel-input\" placeholder=\"这篇文章想解决什么问题？\"/></label></div>",
+      "css": ".ds-panel{padding:24px;background:var(--panel,#1c2330);color:var(--ink,#f6f4ef);border-radius:12px;font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;}.ds-panel-label{display:grid;gap:8px;align-content:start;font-size:.85rem;font-weight:500}.ds-panel-input{font:inherit;color:var(--ink,#f6f4ef);background:var(--input,#121923);border:1px solid var(--line,#354151);border-radius:7px;padding:10px 12px;min-height:42px;caret-color:var(--blue,#86a8ff)}.ds-panel-input::placeholder{color:#98a8bc;opacity:1}.ds-panel-input:focus-visible{outline:3px solid var(--blue,#86a8ff);outline-offset:4px;}@media(max-width:720px){.ds-panel{padding:18px}}"
+    },
+    {
+      "name": "私有状态徽章",
+      "kind": "chip",
+      "refersTo": "badge-private",
+      "description": "文字与色彩共同说明同步状态。",
+      "html": "<span class=\"ds-badge\">仅本机保存</span><span class=\"ds-badge ds-error\">同步暂停</span>",
+      "css": ".ds-badge{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border:1px solid #567f84;border-radius:6px;color:#99ddd1;white-space:nowrap;font-size:.75rem;font-family:\"Segoe UI\",\"Microsoft YaHei\",\"PingFang SC\",sans-serif;}.ds-badge.ds-error{border-color:#ae666c;color:#ffada8}"
+    }
+  ],
+  "narrative": {
+    "northStar": "既有深色、蓝色与卡通头像身份",
+    "overview": "这是已确认的既有身份描述，不新增视觉隐喻。深蓝画布、浅色文字、柔和操作蓝与卡通作者形象连接公开博客和本机后台。公开首页保留较强的卡通表达，阅读页通过安静的边框、清晰层级和稳定行距支持长文。\n\n私有工作台延续同一配色，以中文系统字体、较小圆角、真实内容列表和可辨认的操作状态服务写作。头像保留在品牌位置，正文编辑区不加入卡通装饰。下文带 public/private 的规则仅适用于对应表面；后台组件尺寸不替换公开网站的既有尺寸。",
+    "keyCharacteristics": [
+      "深色画布与浅色正文形成稳定阅读对比。",
+      "操作蓝连接链接、主按钮、选择状态与键盘焦点。",
+      "卡通形象集中于公开品牌表达和私有品牌位置。",
+      "面板依靠色阶、细线与圆角分组，操作状态同时使用文字。"
+    ],
+    "rules": [
+      {
+        "name": "The Surface Scope Rule",
+        "body": "共享身份色；保留各表面已有的字体、控件尺度和分隔线，不能把后台规则推广为公开首页改版。",
+        "section": "colors"
+      },
+      {
+        "name": "The Resting Panel Rule",
+        "body": "常规面板保持无阴影，通过色阶和边界分组；已有柔和投影只用于浮层。",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** 延续深色、操作蓝与现有卡通头像，分别使用公开阅读与私有操作的字体组合。",
+      "**Do** 为键盘操作保留清晰焦点轮廓，并用文字配合状态色。",
+      "**Do** 按各表面的断点重排内容，保留文章、编辑与配图的实际信息。",
+      "**Do** 保留常规面板无阴影和浮层柔和阴影的区别。"
+    ],
+    "donts": [
+      "**Don't** 把私有控件尺寸、系统操作字体或管理入口套到公开首页。",
+      "**Don't** 把公开卡通贴纸和旋转装饰复制进后台编辑区。",
+      "**Don't** 用单一颜色替代状态文字，或把已保存、已推送和已上线合并表达。"
+    ]
+  }
+}

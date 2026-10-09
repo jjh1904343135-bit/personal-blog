@@ -35,7 +35,7 @@ test('private author server authenticates and restricts CMS writes', async () =>
       await delay(100)
     }
     assert.ok(output.includes('作者写作后台'), output)
-    for (const route of ['/admin/', '/admin/config.yml', '/api/v1']) {
+    for (const route of ['/admin/', '/admin/admin.js', '/admin/admin.css', '/admin/config.yml', '/api/v1', '/management/state', '/management/articles', '/management/media']) {
       const res = await fetch(`${origin}${route}`)
       assert.equal(res.status, 401, `${route} requires credentials`)
     }
@@ -53,6 +53,10 @@ test('private author server authenticates and restricts CMS writes', async () =>
     const page = await fetch(`${origin}/admin/`, { headers: { authorization } })
     assert.equal(page.status, 200)
     assert.match(await page.text(), /cms-config-url/)
+    const managed = await fetch(`${origin}/management/state`, {headers:{authorization}})
+    assert.equal(managed.status,200);assert.equal((await managed.json()).sync.automatic,false)
+    const preview = await fetch(`${origin}/management/preview`,{method:'POST',headers:{authorization,'content-type':'application/json',origin},body:JSON.stringify({body:'<script>window.bad=1</script>\n\n[bad](javascript:alert(1))\n\n# 标题'})})
+    const previewData = await preview.json();assert.ok(!previewData.html.includes('<script>'));assert.ok(!previewData.html.includes('href="javascript:'));assert.match(previewData.html,/<h1>标题<\/h1>/)
     const config = await fetch(`${origin}/admin/config.yml`, { headers: { authorization } })
     assert.equal(config.status, 200)
     const yaml = await config.text()
