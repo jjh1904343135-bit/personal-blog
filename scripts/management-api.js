@@ -42,7 +42,7 @@ export function registerManagement(app, { root, express, username, getSyncState,
     try { await fn(req, res) } catch (e) { res.status(e.status || (e.code === 'ENOENT' ? 404 : 500)).json({ error: e instanceof ApiError ? e.message : e.code === 'ENOENT' ? '文件不存在，请刷新列表。' : '操作失败，请检查 Markdown 格式和本机文件权限。' }) }
   }
   app.use('/management', express.json({ limit: '15mb' }))
-  app.get('/management/state', (_req, res) => res.json({ username, categories, sync: getSyncState(), website: 'https://okzu-blog-20261009-a7f3c2.netlify.app' }))
+  app.get('/management/state', (_req, res) => res.json({ username, categories, sync: getSyncState(), website: 'https://okzu-blog.netlify.app' }))
   app.get('/management/articles', route(async (_req, res) => {
     const articles = []
     for (const c of categories) {

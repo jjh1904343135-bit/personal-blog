@@ -85,7 +85,7 @@ npx netlify-cli deploy --prod --no-build --dir=docs/.vitepress/dist
 
 ### GitHub 自动发布
 
-源码仓库：`https://github.com/jjh1904343135-bit/personal-blog`。现有 Netlify 项目 `okzu-blog-20261009-a7f3c2` 已连接此仓库，生产分支使用 `main`。每次推送 `main`，Netlify 都会自动安装依赖、构建文章和搜索索引并发布；无需再次手动上传产物。网站地址保持为 `https://okzu-blog-20261009-a7f3c2.netlify.app`。
+源码仓库：`https://github.com/jjh1904343135-bit/personal-blog`。现有 Netlify 项目 `okzu-blog` 已连接此仓库，生产分支使用 `main`。每次推送 `main`，Netlify 都会自动安装依赖、构建文章和搜索索引并发布；无需再次手动上传产物。网站地址为 `https://okzu-blog.netlify.app`。项目改名后旧的 Netlify 网址不再使用，请更新收藏和分享链接。
 
 #### 保存后自动同步
 
