@@ -19,27 +19,44 @@
         <div class="sidebar-note"><span class="status-dot"></span><strong>本机私有空间</strong><p>只有你能管理内容。<br />访客只看公开博客。</p><a href="https://okzu-blog.netlify.app" target="_blank" rel="noopener noreferrer">打开公开博客</a></div>
       </aside>
       <main id="workspace" tabindex="-1">
-        <header class="page-header"><div><h1 id="page-title">文章管理</h1><p id="page-description">把问题想清楚，再把经验写下来。</p></div><button class="primary" id="create-article"><span aria-hidden="true">＋</span>新建文章</button><label class="primary" id="upload-label" hidden>上传配图<input id="upload" type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/avif" hidden multiple /></label></header>
-        <section class="sync-strip" aria-label="发布同步状态"><div><span id="sync-badge" class="badge">读取状态</span><p id="sync-message">正在连接本机后台…</p></div><button id="sync-now" class="secondary">立即同步</button></section>
+        <header class="page-header"><div><h1 id="page-title">文章管理</h1><p id="page-description">把问题想清楚，再把经验写下来。</p></div><button class="primary" id="create-article"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新建笔记</button><label class="primary" id="upload-label" hidden>上传配图<input id="upload" type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/avif" hidden multiple /></label></header>
+        <section class="sync-strip" aria-label="发布同步状态"><div><span id="sync-badge" class="badge">读取状态</span><p id="sync-message">正在连接本机后台…</p></div><button id="sync-now" class="secondary">重试待发布</button></section>
         <details class="sync-history"><summary>查看同步记录</summary><ol id="sync-logs"><li>暂无本次运行记录。</li></ol></details>
         <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
         <section id="articles-view">
           <div class="filters"><label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="article-search" type="search" placeholder="搜索标题、摘要或标签" aria-label="搜索文章" /></label><label class="category-label">栏目<select id="category-filter"><option value="">全部栏目</option></select></label><span id="result-count" class="muted">正在读取文章…</span></div>
+          <label class="status-filter">状态<select id="status-filter"><option value="">全部状态</option><option value="draft">私有草稿</option><option value="changed">未发布修改</option><option value="published">已发布</option><option value="pending">待重试发布</option></select></label>
           <div id="article-list" class="article-list" aria-busy="true"><div class="loading">正在读取你的文章…</div></div>
         </section>
-        <section id="media-view" hidden><p class="muted media-hint">上传后复制 Markdown 引用，即可插入正文。支持 PNG、JPG、GIF、WebP、AVIF，每张不超过 8 MB。</p><div id="drop-zone" class="drop-zone">把配图拖到这里，或点击上方“上传配图”。</div><label class="media-search-label">查找配图<input id="media-search" type="search" placeholder="输入图片文件名" /></label><div id="media-list" class="media-list"></div></section>
+        <section id="media-view" hidden><p class="muted media-hint">新配图先保存在本机，只有发布文章时，正文用到的图片才公开。支持 PNG、JPG、GIF、WebP、AVIF，每张不超过 8 MB。</p><div id="drop-zone" class="drop-zone">把配图拖到这里，或点击上方“上传配图”。</div><label class="media-search-label">查找配图<input id="media-search" type="search" placeholder="输入图片文件名" /></label><div id="media-list" class="media-list"></div></section>
         <section id="editor-view" hidden>
-          <div class="editor-heading"><button class="secondary" id="back-to-list">返回文章列表</button><p id="save-hint" class="muted">尚未保存</p><button class="primary" id="save-article" form="article-form" type="submit">保存到本机</button></div>
+          <div class="editor-heading"><button class="secondary" id="back-to-list">返回列表</button><p id="save-hint" class="muted" role="status" aria-live="polite">尚未保存</p><button class="secondary" id="save-article" form="article-form" type="submit">保存草稿</button><button class="primary" id="publish-article">发布文章</button></div>
           <form id="article-form">
-            <div class="metadata"><label class="full">文章标题<input name="title" required maxlength="200" placeholder="这篇文章想解决什么问题？" /></label><label>所属栏目<select name="key" required></select></label><label>文件名<input name="slug" required maxlength="101" placeholder="如 tool-calling-notes" /><small>创建后固定，支持中文或字母、数字、连字符。</small></label><label>发布日期<input name="date" type="date" required /></label><label>阅读时长<input name="readingTime" maxlength="80" placeholder="约 8 分钟" /></label><label class="full">文章摘要<textarea name="description" rows="2" required maxlength="2000" placeholder="用一两句话告诉读者可以学到什么。"></textarea></label><label class="full">标签<input name="tags" placeholder="用中文逗号或英文逗号分隔，如 Agent，工具调用" /></label></div>
-            <div class="editor-tabs" role="group" aria-label="正文视图"><button type="button" id="tab-edit" class="selected" aria-pressed="true">Markdown 正文</button><button type="button" id="tab-preview" aria-pressed="false">阅读预览</button></div>
-            <div class="writing-area"><label class="body-label">Markdown 正文<textarea name="body" rows="24" spellcheck="false" placeholder="# 开始写作&#10;&#10;记录你的思路、代码和复盘。"></textarea></label><section class="preview-pane" aria-label="正文预览"><h2>阅读预览</h2><div id="preview" class="prose"><p class="muted">正文会在这里显示为阅读效果。</p></div></section></div>
+            <div class="note-sheet">
+              <label class="note-title">笔记标题<textarea name="title" rows="2" maxlength="200" placeholder="无标题笔记"></textarea></label>
+              <div class="note-meta"><label>栏目<select name="key"></select></label><span>自动保存到本机 · 发布前仅你可见</span></div>
+              <details class="publish-settings"><summary>发布设置 · 文件名、摘要与标签</summary><div class="metadata"><label>文件名<input name="slug" maxlength="101" placeholder="如 redis-cache-notes" /><small>决定文章网址。首次发布后固定。</small></label><label>发布日期<input name="date" type="date" /></label><label>阅读时长<input name="readingTime" maxlength="80" placeholder="约 8 分钟" /></label><label class="full">摘要<textarea name="description" rows="2" maxlength="2000" placeholder="选填，不填写则从正文提取摘要。"></textarea></label><label class="full">标签<input name="tags" placeholder="用逗号分隔，如 Redis，缓存" /></label></div></details>
+              <div class="editor-tabs" role="group" aria-label="正文视图"><button type="button" id="tab-edit" class="selected" aria-pressed="true">笔记编辑</button><button type="button" id="tab-source" aria-pressed="false">Markdown</button><button type="button" id="tab-preview" aria-pressed="false">阅读预览</button><button type="button" id="export-note">导出 Markdown</button></div>
+              <p id="source-warning" class="muted" hidden>这篇文章含 VitePress 特殊语法，已保留源码编辑，避免转换时丢失内容。</p>
+              <div id="note-toolbar" class="note-toolbar" role="group" aria-label="正文排版工具">
+                <label class="sr-only" for="heading-level">段落格式</label><select id="heading-level"><option value="">正文</option><option value="1">一级标题</option><option value="2">二级标题</option><option value="3">三级标题</option></select>
+                <button type="button" data-command="bold" aria-pressed="false"><strong>粗体</strong></button><button type="button" data-command="italic" aria-pressed="false"><em>斜体</em></button><button type="button" data-command="bullet">列表</button><button type="button" data-command="ordered">编号</button><button type="button" data-command="quote">引用</button><button type="button" data-command="code">代码块</button><button type="button" data-command="table">表格</button><button type="button" id="choose-image">图片</button><button type="button" id="add-link">链接</button><button type="button" data-command="undo">撤销</button><button type="button" data-command="redo">重做</button>
+              </div>
+              <div id="code-tools" class="context-tools" hidden><label>代码语言<select id="code-language"><option value="java">Java</option><option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="python">Python</option><option value="sql">SQL</option><option value="bash">Shell</option><option value="json">JSON</option><option value="yaml">YAML</option><option value="go">Go</option><option value="plaintext">纯文本</option></select></label></div>
+              <div id="table-tools" class="context-tools" hidden><button type="button" data-command="row">添加行</button><button type="button" data-command="column">添加列</button><button type="button" data-command="deleteTable">移除表格</button></div>
+              <div id="note-content"></div>
+              <label id="source-pane" class="body-label" hidden>Markdown 正文<textarea name="body" rows="24" spellcheck="false" placeholder="记录你的思路、代码和复盘。"></textarea></label>
+              <section id="preview-pane" class="preview-pane" aria-label="正文预览" hidden><div id="preview" class="prose"></div></section>
+              <div class="document-foot"><span id="word-count">0 字</span><span>可直接粘贴图片 · Ctrl / ⌘ + S 保存草稿</span></div>
+            </div>
           </form>
         </section>
         <footer>内容属于你，发布由你掌控。<span>ok俎的个人博客</span></footer>
       </main>
     </div>
-    <dialog id="delete-dialog"><form method="dialog"><h2>删除这篇文章？</h2><p id="delete-description"></p><p class="muted">开启自动同步时，这次删除也会同步到公开仓库和网站。</p><div class="dialog-actions"><button class="secondary" value="cancel" autofocus>取消</button><button class="danger" value="delete">确认删除</button></div></form></dialog>
+    <dialog id="delete-dialog"><form method="dialog"><h2>丢弃私有草稿？</h2><p id="delete-description"></p><p class="muted">公开文章不受影响。丢弃后，这份未发布的改动无法恢复。</p><div class="dialog-actions"><button class="secondary" value="cancel" autofocus>取消</button><button class="danger" value="delete">丢弃草稿</button></div></form></dialog>
+    <dialog id="image-dialog"><h2>插入文章配图</h2><p class="muted">上传的图片先留在本机，随文章一起发布。</p><label class="secondary">上传并插入<input id="insert-image" type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/avif" hidden multiple /></label><button class="secondary" id="close-images">关闭</button><div id="image-picker" class="media-list"></div></dialog>
+    <dialog id="link-dialog"><form id="link-form"><h2>插入链接</h2><label>链接地址<input id="link-url" type="url" placeholder="https://…" /></label><p class="muted">留空可移除已选文字的链接。</p><div class="dialog-actions"><button type="button" class="secondary" id="cancel-link">取消</button><button class="primary" type="submit">应用链接</button></div></form></dialog>
     <noscript>管理后台需要启用 JavaScript。文章文件仍可在本机 docs 目录中编辑。</noscript>
     <script src="/admin/admin.js" type="module"></script>
   </body>

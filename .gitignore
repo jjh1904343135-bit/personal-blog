@@ -1,4 +1,6 @@
 node_modules/
+private/data/
+private/admin/assets/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
 .env

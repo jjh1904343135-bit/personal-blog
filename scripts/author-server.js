@@ -5,7 +5,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { readFile, lstat } from 'node:fs/promises'
 import { categories } from '../docs/categories.js'
-import { createContentPublisher, startContentWatch } from './content-sync.js'
+import { createContentPublisher, SyncError } from './content-sync.js'
 import { registerManagement } from './management-api.js'
 
 // Use the Express version bundled with the installed Decap proxy.
@@ -53,20 +53,34 @@ app.use((req, res, next) => {
 app.get(['/', '/admin', '/admin/', '/admin/index.html'], (_req, res) => {
   res.type('html').sendFile(path.join(privateRoot, 'index.html'))
 })
-for (const file of ['admin.css', 'admin.js']) app.get(`/admin/${file}`, (_req, res) => res.sendFile(path.join(privateRoot, file)))
+for (const file of ['admin.css', 'admin.js', 'note-editor.js']) app.get(`/admin/${file}`, (_req, res) => res.sendFile(path.join(privateRoot, file)))
+app.use('/admin/assets', express.static(path.join(privateRoot, 'assets'), {index:false, dotfiles:'deny'}))
+// Existing public illustrations stay authenticated when shown in the editor.
+app.use('/images', express.static(path.join(root, 'docs/public/images'), {index:false, dotfiles:'deny'}))
 app.get('/admin/avatar.webp', (_req, res) => res.sendFile(path.join(root, 'docs/public/images/okzu-avatar.webp')))
-const autoSync = process.argv.includes('--sync')
-let contentWatcher, manualJob, manualController
-let syncState = { automatic: autoSync, phase: 'idle', message: autoSync ? '自动同步已开启，保存后等待 30 秒。' : '仅本机保存，自动同步未开启。', logs: [] }
+let manualJob, manualController, terminalStatus
+let syncState = { automatic: false, phase: 'idle', message: '草稿只保存在本机。点击发布后自动构建、推送。', logs: [] }
 function updateSync(update) {
   syncState = { ...syncState, ...update }
   if (update.phase !== 'waiting') syncState.logs = [...syncState.logs, { time: new Date().toISOString(), message: update.message }].slice(-12)
 }
-const publisher = createContentPublisher({ root, onStatus: updateSync })
-registerManagement(app, { root, express, username, getSyncState: () => syncState, syncNow: () => {
+const publisher = createContentPublisher({ root, onStatus: update => {
+  if (manualJob && ['pushed', 'idle'].includes(update.phase)) {
+    terminalStatus = update
+    updateSync({phase:'pushing',message:'同步已完成，正在确认笔记版本…'})
+  } else updateSync(update)
+} })
+await registerManagement(app, { root, express, username, getSyncState: () => syncState, syncNow: prepare => {
   if (manualJob || ['checking', 'building', 'pushing'].includes(syncState.phase)) return false
   manualController = new AbortController()
-  manualJob = publisher.sync({ signal: manualController.signal }).catch(() => {}).finally(() => { manualJob = null; manualController = null })
+  terminalStatus = null
+  updateSync({phase:'checking',message:'正在准备发布，草稿不会自动公开…'})
+  manualJob = (async () => {
+    const afterPush = prepare ? await prepare() : null
+    await publisher.sync({signal:manualController.signal})
+    if (afterPush) await afterPush()
+    updateSync(terminalStatus || {phase:'idle',message:'同步完成，私有草稿未公开。'})
+  })().catch(error => updateSync({phase:'error',message:error.status || error instanceof SyncError ? error.message : '发布未完成。草稿已保留，请检查同步记录并重试。'})).finally(() => { manualJob = null; manualController = null })
   return true
 } })
 app.get(['/config.yml', '/admin/config.yml'], async (_req, res, next) => {
@@ -129,15 +143,13 @@ const server = app.listen(port, '127.0.0.1', () => {
   console.log(`账号：${username}`)
   if (!configuredPassword) console.log(`本次临时密码：${password}`)
   console.log('仅本机可访问。密码验证同时保护页面、配置和保存接口。')
-  console.log(autoSync ? '自动公开已启用：保存的文章及配图将自动提交，由 Netlify 构建上线。\n' : '仅本机保存；npm run write 可开启自动公开发布。\n')
-  if (autoSync) contentWatcher = startContentWatch(publisher, { onStatus: updateSync })
+  console.log('笔记式写作：草稿自动保存到私有目录，点击发布才会推送上线。\n')
 })
 server.on('error', error => {
   console.error(error.code === 'EADDRINUSE' ? `端口 ${port} 被占用，请停止旧写作后台或修改 AUTHOR_PORT。` : error.message)
   process.exitCode = 1
 })
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, async () => {
-  await contentWatcher?.stop()
   manualController?.abort()
   await manualJob
   server.close(() => process.exit(0))

@@ -7,6 +7,8 @@ import path from 'node:path'
 import os from 'node:os'
 import { setTimeout as delay } from 'node:timers/promises'
 import { createContentPublisher, startContentWatch, isContentPath, SyncError } from './content-sync.js'
+import { createNoteStore } from './note-store.js'
+import { categories } from '../docs/categories.js'
 const execute = promisify(execFile)
 const quiet = () => {}
 async function fixture(t) {
@@ -24,6 +26,22 @@ async function fixture(t) {
 test('only six article folders and image assets are eligible',()=>{
   for(const p of ['docs/agent/工具调用.md','docs/algorithms/lru cache [1].md','docs/public/images/a.webp']) assert.ok(isContentPath(p),p)
   for(const p of ['.env','private/admin/index.html','docs/profile.js','docs/.vitepress/config.js','docs/agent/index.md','docs/agent/.env.md','docs/agent/sub/a.md','docs/public/images/../../.env','docs/public/images/.key.png']) assert.ok(!isContentPath(p),p)
+})
+
+test('private note to explicit publication pushes only article and referenced image to a local remote',async t=>{
+  const f=await fixture(t)
+  for(const c of categories)await mkdir(path.join(f.root,'docs',c.key),{recursive:true})
+  const store=createNoteStore(f.root);await store.init()
+  const image=`${'c'.repeat(32)}.png`
+  await f.write(`private/data/media/${image}`,Buffer.from([137,80,78,71,13,10,26,10]))
+  const saved=await store.save({title:'缓存笔记',key:'backend',slug:'cache-notes',description:'测试笔记',date:'2026-10-10',tags:['Redis'],readingTime:'约 3 分钟',body:`# 缓存\n\n![图](/author-media/${image})\n\n\`\`\`java\nreturn cache.get(key);\n\`\`\``})
+  const initial=await f.git('rev-parse','HEAD')
+  assert.equal((await f.make().sync()).status,'idle');assert.equal(await f.git('rev-parse','HEAD'),initial)
+  const receipt=await store.materialize(saved.draftId,saved.id)
+  assert.equal((await f.make().sync()).status,'pushed');await store.complete(receipt)
+  assert.equal(await f.git('rev-parse','HEAD'),await f.git('rev-parse','origin/main'))
+  const published=await f.git('show','origin/main:docs/backend/cache-notes.md');assert.match(published,/category: 后端/);assert.match(published,/```java/);assert.match(published,new RegExp(`/images/note-${image}`))
+  assert.equal(await f.git('ls-files','private/data'),'');assert.equal((await store.list()).find(n=>n.draftId===saved.draftId).status,'published')
 })
 test('add/edit/delete and literal Unicode paths push to a local remote without extra commits',async t=>{
   const f=await fixture(t), file='docs/algorithms/算法 [1].md';await f.write(file,'article');await f.write('docs/profile.js','must remain local');await f.write('.env','GEMINI_API_KEY=local-only-secret')

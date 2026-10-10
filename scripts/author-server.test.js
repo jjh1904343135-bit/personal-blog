@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { once } from 'node:events'
 import { request } from 'node:http'
-import { readFile } from 'node:fs/promises'
+import { readFile, unlink } from 'node:fs/promises'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 
@@ -27,6 +27,7 @@ test('private author server authenticates and restricts CMS writes', async () =>
     body: JSON.stringify(body)
   })
   let created = false
+  let privateDraft, privateImage
   const slug = `author-verification-${randomBytes(8).toString('hex')}`
   const articlePath = `docs/algorithms/${slug}.md`
   try {
@@ -35,7 +36,7 @@ test('private author server authenticates and restricts CMS writes', async () =>
       await delay(100)
     }
     assert.ok(output.includes('作者写作后台'), output)
-    for (const route of ['/admin/', '/admin/admin.js', '/admin/admin.css', '/admin/config.yml', '/api/v1', '/management/state', '/management/articles', '/management/media']) {
+    for (const route of ['/admin/', '/admin/admin.js', '/admin/admin.css', '/admin/assets/editor.js', '/admin/config.yml', '/api/v1', '/management/state', '/management/articles', '/management/media', `/author-media/${'a'.repeat(32)}.png`]) {
       const res = await fetch(`${origin}${route}`)
       assert.equal(res.status, 401, `${route} requires credentials`)
     }
@@ -57,6 +58,16 @@ test('private author server authenticates and restricts CMS writes', async () =>
     assert.equal(managed.status,200);assert.equal((await managed.json()).sync.automatic,false)
     const preview = await fetch(`${origin}/management/preview`,{method:'POST',headers:{authorization,'content-type':'application/json',origin},body:JSON.stringify({body:'<script>window.bad=1</script>\n\n[bad](javascript:alert(1))\n\n# 标题'})})
     const previewData = await preview.json();assert.ok(!previewData.html.includes('<script>'));assert.ok(!previewData.html.includes('href="javascript:'));assert.match(previewData.html,/<h1>标题<\/h1>/)
+    const management = (route,method,body) => fetch(`${origin}/management/${route}`,{method,headers:{authorization,'content-type':'application/json',origin},body:JSON.stringify(body)})
+    const saved = await management('articles','POST',{title:'',slug:`${slug}-draft`,key:'backend',date:'',description:'',tags:[],body:'未完成私有笔记'})
+    assert.equal(saved.status,200);privateDraft=await saved.json();assert.equal(privateDraft.status,'draft');assert.equal(privateDraft.path,null)
+    await assert.rejects(readFile(fileURLToPath(new URL(`../docs/backend/${slug}-draft.md`,import.meta.url))),{code:'ENOENT'})
+    const stale=await management('articles','POST',{...privateDraft,expectedId:'stale'});assert.equal(stale.status,409)
+    const uploaded=await management('media','POST',{name:'verification.png',content:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aY1EAAAAASUVORK5CYII='})
+    assert.equal(uploaded.status,200);privateImage=(await uploaded.json()).name;assert.match(privateImage,/^[a-f\d]{32}\.png$/)
+    assert.equal((await fetch(`${origin}/author-media/${privateImage}`,{headers:{authorization}})).status,200)
+    assert.equal((await fetch(`${origin}/author-media/${privateImage}`)).status,401)
+    assert.equal((await management('publish','POST',{})).status,400)
     const config = await fetch(`${origin}/admin/config.yml`, { headers: { authorization } })
     assert.equal(config.status, 200)
     const yaml = await config.text()
@@ -79,6 +90,8 @@ test('private author server authenticates and restricts CMS writes', async () =>
     assert.equal((await api({ action: 'persistEntry', params: { branch: 'main', entry: { path: 'docs/algorithms/index.md', slug: 'index', raw }, assets: [], options: { commitMessage: 'Verification', useWorkflow: false } } })).status, 403)
     assert.equal((await api({ action: 'deleteFile', params: { branch: 'main', path: '.env', options: { commitMessage: 'Verification' } } })).status, 403)
   } finally {
+    if(privateDraft)assert.equal((await fetch(`${origin}/management/articles`,{method:'DELETE',headers:{authorization,origin,'content-type':'application/json'},body:JSON.stringify({draftId:privateDraft.draftId,expectedId:privateDraft.id})})).status,200)
+    if(privateImage){assert.match(privateImage,/^[a-f\d]{32}\.png$/);await unlink(fileURLToPath(new URL(`../private/data/media/${privateImage}`,import.meta.url)))}
     if (created) {
       const cleanup = await api({ action: 'deleteFile', params: { branch: 'main', path: articlePath, options: { commitMessage: 'Remove temporary verification article' } } })
       assert.equal(cleanup.status, 200)
