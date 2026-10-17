@@ -21,6 +21,8 @@ let targetX = 0
 let targetY = 0
 let gazeX = 0
 let gazeY = 0
+let poseX = 0
+let poseY = 0
 let headX = 0
 let headY = 0
 let lastTextureIds = []
@@ -86,8 +88,8 @@ function textureFor(image) {
 }
 
 function pose() {
-  const px = Math.min(1.9999, Math.max(0, gazeX + 1))
-  const py = Math.min(1.9999, Math.max(0, gazeY + 1))
+  const px = Math.min(1.9999, Math.max(0, poseX * .72 + 1))
+  const py = Math.min(1.9999, Math.max(0, poseY * .72 + 1))
   const ix = Math.floor(px)
   const iy = Math.floor(py)
   const fx = px - ix
@@ -104,9 +106,12 @@ function draw(now) {
   const elapsed = Math.min(64, Math.max(0, now - (lastTime || now)))
   lastTime = now
   const eyeEase = 1 - Math.exp(-elapsed / 72)
+  const poseEase = 1 - Math.exp(-elapsed / 155)
   const headEase = 1 - Math.exp(-elapsed / 210)
   gazeX += (targetX - gazeX) * eyeEase
   gazeY += (targetY - gazeY) * eyeEase
+  poseX += (targetX - poseX) * poseEase
+  poseY += (targetY - poseY) * poseEase
   headX += (targetX - headX) * headEase
   headY += (targetY - headY) * headEase
 
@@ -129,6 +134,7 @@ function draw(now) {
     stage.style.setProperty('--portrait-shift-x', `${(headX * 4).toFixed(2)}px`)
   }
   if (Math.abs(targetX - gazeX) > .001 || Math.abs(targetY - gazeY) > .001 ||
+      Math.abs(targetX - poseX) > .001 || Math.abs(targetY - poseY) > .001 ||
       Math.abs(targetX - headX) > .001 || Math.abs(targetY - headY) > .001) {
     frame = requestAnimationFrame(draw)
   }
