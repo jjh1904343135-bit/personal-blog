@@ -2,19 +2,16 @@
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vitepress'
 import { profile } from '../../../profile.js'
+import AboutPortrait from './AboutPortrait.vue'
 
 const router = useRouter()
 const page = ref(null)
 const hero = ref(null)
 const portrait = ref(null)
+const portraitMotion = ref(null)
 const modal = ref(null)
 const closeButton = ref(null)
 const isOpen = ref(false)
-const expression = ref('neutral')
-const expressionStates = ['neutral', 'left', 'right', 'up-left', 'up', 'up-right', 'down', 'down-left', 'down-right']
-let pendingExpression = 'neutral'
-let expressionChangedAt = 0
-let expressionTimer
 let opener
 let previousOverflow = ''
 const canvas = ref(null)
@@ -31,6 +28,7 @@ let canvasFrame = 0
 let canvasContext
 let ripples = []
 let lastRipple = 0
+let lastPointer = null
 let reduceMotion = false
 let coarsePointer = false
 
@@ -51,29 +49,20 @@ function updateEyes(event) {
   const centerY = rect.top + rect.height * .38
   const nx = clamp((event.clientX - centerX) / (window.innerWidth * .42), -1, 1)
   const ny = clamp((event.clientY - centerY) / (window.innerHeight * .5), -1, 1)
-  const horizontal = nx < -.18 ? 'left' : nx > .18 ? 'right' : ''
-  const vertical = ny < -.2 ? 'up' : ny > .26 ? 'down' : ''
-  const state = [vertical, horizontal].filter(Boolean).join('-') || 'neutral'
+  portraitMotion.value?.setTarget(nx, ny)
   const now = performance.now()
-  if (state !== pendingExpression) {
-    pendingExpression = state
-    expressionChangedAt = now
-    clearTimeout(expressionTimer)
-    expressionTimer = setTimeout(() => { expression.value = state }, 65)
-  }
-  // A short dwell prevents flicker when the pointer crosses sector boundaries.
-  if (state !== expression.value && now - expressionChangedAt >= 65) expression.value = state
-
-  if (canvasContext && now - lastRipple > 95) {
-    ripples.push({ x: event.clientX, y: event.clientY, born: now, life: 340, max: 28, alpha: .1 })
+  const distance = lastPointer ? Math.hypot(event.clientX - lastPointer.x, event.clientY - lastPointer.y) : Infinity
+  if (canvasContext && now - lastRipple > 18 && distance > 9) {
+    ripples.push({ x: event.clientX, y: event.clientY, born: now, life: 300, max: 19, alpha: .17 })
     lastRipple = now
+    lastPointer = { x: event.clientX, y: event.clientY }
+    startRippleFrame()
   }
 }
 
 function resetEyes() {
-  clearTimeout(expressionTimer)
-  expression.value = 'neutral'
-  pendingExpression = 'neutral'
+  portraitMotion.value?.reset()
+  lastPointer = null
 }
 
 function onScroll() {
@@ -87,6 +76,7 @@ function selectFolder(key) {
   document.body.style.overflow = 'hidden'
   isOpen.value = true
   resetEyes()
+  stopRipples()
   nextTick(() => closeButton.value?.focus())
 }
 
@@ -120,28 +110,43 @@ function resizeCanvas() {
 }
 
 function addClickRipple(event) {
-  if (!canvasContext || reduceMotion || coarsePointer) return
-  ripples.push({ x: event.clientX, y: event.clientY, born: performance.now(), life: 430, max: 70, alpha: .3, click: true })
+  if (!canvasContext || reduceMotion || coarsePointer || isOpen.value || !heroIsVisible()) return
+  ripples.push({ x: event.clientX, y: event.clientY, born: performance.now(), life: 460, max: 58, alpha: .26, click: true })
+  startRippleFrame()
+}
+
+function startRippleFrame() {
+  if (!canvasFrame && ripples.length && !document.hidden && heroIsVisible() && !isOpen.value) {
+    canvasFrame = requestAnimationFrame(drawRipples)
+  }
+}
+
+function stopRipples() {
+  cancelAnimationFrame(canvasFrame)
+  canvasFrame = 0
+  ripples = []
+  canvasContext?.clearRect(0, 0, window.innerWidth, window.innerHeight)
 }
 
 function drawRipples(now) {
-  if (!canvasContext) return
+  canvasFrame = 0
+  if (!canvasContext || document.hidden || isOpen.value || !heroIsVisible()) { stopRipples(); return }
   canvasContext.clearRect(0, 0, window.innerWidth, window.innerHeight)
   ripples = ripples.filter(item => now - item.born < item.life)
   for (const ripple of ripples) {
     const t = clamp((now - ripple.born) / ripple.life, 0, 1)
-    const eased = 1 - Math.pow(1 - t, 3)
-    const rings = ripple.click ? 3 : 2
+    const eased = 1 - Math.pow(1 - t, 2)
+    const rings = ripple.click ? 2 : 3
     for (let ring = 0; ring < rings; ring += 1) {
-      const delayed = clamp(t - ring * .08, 0, 1)
+      const delayed = clamp(t - ring * .09, 0, 1)
       canvasContext.beginPath()
-      canvasContext.arc(ripple.x, ripple.y, 6 + ripple.max * eased + ring * 6, 0, Math.PI * 2)
-      canvasContext.strokeStyle = `rgba(113, 137, 204, ${ripple.alpha * (1 - delayed)})`
-      canvasContext.lineWidth = ripple.click ? .9 : .6
+      canvasContext.arc(ripple.x, ripple.y, 2 + ripple.max * eased + ring * (ripple.click ? 4 : 2.5), 0, Math.PI * 2)
+      canvasContext.strokeStyle = `rgba(156, 185, 224, ${ripple.alpha * Math.pow(1 - delayed, 2)})`
+      canvasContext.lineWidth = ripple.click ? 1 : .65
       canvasContext.stroke()
     }
   }
-  canvasFrame = requestAnimationFrame(drawRipples)
+  startRippleFrame()
 }
 
 function goHome(event) {
@@ -158,7 +163,6 @@ onMounted(async () => {
   addEventListener('keydown', handleModalKey)
   if (!reduceMotion && !coarsePointer) {
     resizeCanvas()
-    canvasFrame = requestAnimationFrame(drawRipples)
   }
 })
 
@@ -168,7 +172,7 @@ onBeforeUnmount(() => {
   removeEventListener('keydown', handleModalKey)
   if (isOpen.value) document.body.style.overflow = previousOverflow
   cancelAnimationFrame(canvasFrame)
-  clearTimeout(expressionTimer)
+  stopRipples()
 })
 </script>
 
@@ -194,9 +198,9 @@ onBeforeUnmount(() => {
         <span>{{ profile.role }}</span>
       </div>
 
-      <div ref="portrait" class="portrait-stage" :data-expression="expression" aria-label="根据鼠标方向展示原视频中的人物眼神和表情">
+      <div ref="portrait" class="portrait-stage" aria-label="根据鼠标方向展示原视频中的人物眼神和表情">
         <div class="portrait-halo"></div>
-        <img v-for="state in expressionStates" :key="state" class="video-expression" :class="{ 'is-current': expression === state }" :src="`/images/about-expressions/${state}.webp`" :alt="state === 'neutral' ? '从原视频提取的俎嘉辉卡通人物' : ''" :aria-hidden="expression !== state" draggable="false">
+        <AboutPortrait ref="portraitMotion" />
         <span class="gaze-tip">移动鼠标<br>看看我的表情 ↗</span>
       </div>
 
@@ -299,4 +303,56 @@ onBeforeUnmount(() => {
 .blinking .eyelid{height:7.4%;opacity:1}.blinking .pupil{opacity:0}.pupil{transition:scale .22s,opacity .08s}
 .portrait-stage{aspect-ratio:1;transform:translateX(-50%);width:min(49vw,720px)}.portrait-stage .video-expression{opacity:0;pointer-events:none;object-fit:contain}.portrait-stage .video-expression.is-current{opacity:1}.portrait-halo{inset:0 -3% 2%}
 @media(max-width:720px){.portrait-stage{width:min(94vw,470px);bottom:21%}}
+
+/* The four archive tickets trace a shallow arc above the video portrait. */
+.portfolio-hero{min-height:760px}
+.portrait-stage{bottom:-4%;left:50%;width:min(49vw,720px);transform:translateX(calc(-50% + var(--portrait-shift-x,0px))) perspective(900px) rotateY(var(--portrait-turn-y,0deg)) rotateX(var(--portrait-turn-x,0deg));transform-origin:50% 70%;will-change:transform}
+.portrait-stage .portrait-poster,.portrait-stage .portrait-motion{display:block}
+.ticket-experience{left:calc(50% - min(44vw,650px));top:clamp(175px,24vh,255px);transform:rotate(-8deg)}
+.ticket-projects{left:calc(50% - min(25vw,365px));top:clamp(100px,12vh,145px);transform:rotate(-3deg)}
+.ticket-skills{right:calc(50% - min(25vw,365px));top:clamp(100px,12vh,145px);transform:rotate(3deg)}
+.ticket-education{right:calc(50% - min(44vw,650px));top:clamp(175px,24vh,255px);bottom:auto;transform:rotate(8deg)}
+.folder-ticket:focus-visible{outline:3px solid #b9d9f7;outline-offset:5px}
+.ripple-canvas{z-index:30}
+@media(max-width:1050px) and (min-width:901px){.folder-ticket{width:205px}.ticket-experience{left:2.5%}.ticket-projects{left:24%}.ticket-skills{right:24%}.ticket-education{right:2.5%}}
+@media(max-width:900px){
+  .portfolio-hero{height:auto;min-height:1080px;padding:0 20px 38px;overflow:hidden}
+  .portrait-stage{top:340px;bottom:auto;left:50%;width:min(70vw,520px);margin:0}
+  .folder-ticket{position:absolute;width:calc(50% - 38px);max-width:315px;min-height:110px;margin:0;padding:14px 18px;transform:none!important}
+  .ticket-experience{left:24px!important;right:auto!important;top:108px!important;bottom:auto!important}
+  .ticket-projects{left:auto!important;right:24px!important;top:108px!important;bottom:auto!important}
+  .ticket-skills{left:24px!important;right:auto!important;top:232px!important;bottom:auto!important}
+  .ticket-education{left:auto!important;right:24px!important;top:232px!important;bottom:auto!important}
+  .hero-title{position:absolute;left:32px;top:calc(350px + min(70vw,520px));bottom:auto;margin:0;pointer-events:none}
+  .hero-title>p{font-size:clamp(26px,4.5vw,42px)}
+  .hero-title h1{font-size:clamp(45px,7vw,72px)}
+  .hero-note,.scroll-hint{display:none}
+  .gaze-tip{right:-10%;top:37%}
+}
+@media(min-width:721px) and (max-width:900px){
+  .portfolio-hero{min-height:1170px}
+  .ticket-skills,.ticket-education{top:268px!important}
+  .portrait-stage{top:426px}
+  .hero-title{top:calc(444px + min(70vw,520px))}
+}
+@media(max-width:720px){
+  .portfolio-hero{min-height:calc(374px + min(94vw,470px) + 170px);padding:0 12px 32px;display:block}
+  .portrait-stage{top:344px;bottom:auto;width:min(94vw,470px)}
+  .folder-ticket{width:calc(50% - 20px);min-height:105px;padding:12px 14px}
+  .folder-ticket:first-of-type{margin-top:0}
+  .ticket-experience{left:12px!important;top:82px!important}
+  .ticket-projects{right:12px!important;top:82px!important}
+  .ticket-skills{left:12px!important;top:204px!important}
+  .ticket-education{right:12px!important;top:204px!important}
+  .hero-title{left:18px;top:calc(356px + min(94vw,470px));bottom:auto}
+  .hero-title>p{font-size:22px}
+  .hero-title h1{font-size:clamp(36px,10vw,52px);line-height:.95}
+  .ticket-no{font-size:25px}
+  .ticket-copy{margin:6px 0 0}
+  .ticket-copy b{font-size:17px}
+  .ticket-copy i{display:none}
+  .gaze-tip{display:none}
+}
+@media(max-width:420px){.folder-ticket{width:calc(50% - 19px);padding:10px 12px}.ticket-copy b{font-size:16px}.ticket-copy small{font-size:8px}.ticket-action{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.portrait-stage{transform:translateX(-50%)}}
 </style>
