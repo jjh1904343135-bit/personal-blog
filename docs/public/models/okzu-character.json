@@ -1,0 +1,19 @@
+{
+  "generator": "Blender 4.5.14 LTS",
+  "source": "scripts/build-character.py",
+  "triangles": 65819,
+  "license": "Original procedural character created for ok俎; likeness based on user-authorized references.",
+  "controls": [
+    "HeadPivot",
+    "NeckPivot",
+    "Eye_L",
+    "Eye_R"
+  ],
+  "morphTargets": [
+    "Smile",
+    "BrowRaise",
+    "MouthOpen"
+  ],
+  "orthographicSize": 4.5,
+  "centerHeight": 2.65
+}

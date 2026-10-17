@@ -1,4 +1,5 @@
 node_modules/
+.tools/
 private/data/
 private/admin/assets/
 docs/.vitepress/cache/

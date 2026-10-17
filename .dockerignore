@@ -1,4 +1,8 @@
 node_modules
+.tools
+person
+.netlify
+.impeccable
 docs/.vitepress/cache
 docs/.vitepress/dist
 .git
