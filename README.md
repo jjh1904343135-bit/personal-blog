@@ -62,23 +62,6 @@ npm run write
 
 目前提供的是本机私有写作后台，不能从公网远程登录。远程写作需要额外部署有身份验证的服务或配置 GitHub OAuth；纯静态托管不能处理作者登录和 Markdown 保存。
 
-## 关于我的三维人物
-
-`/about` 使用 Blender 制作的真实网格和 Three.js 连续追视，不再按方向切换人物截图。眼球先跟随，头颈和轻微表情随后平滑变化；离开鼠标或打开资料卡时回正。触屏不模拟鼠标；减少动态效果、WebGL 不可用或模型下载失败时使用同模型海报，资料卡仍可访问。首页和文章页不加载三维引擎或模型。
-
-GLB、海报和模型说明保存在 `docs/public/models/`，已经随源码提交，常规开发、Docker 和 Netlify 构建均不需要安装 Blender。源 `.blend` 保存在本机 `person/about-3d/`，便携版在 `.tools/blender/`；两者都不进入 Git 或 Docker，请按需自行备份。人物是根据授权参考制作的近似卡通形象，不是从视频恢复的精确原模型。
-
-需要重建资产时，下载 Blender 官方 4.5 LTS Windows x64 便携包，校验官方 SHA256，解压到 `.tools/blender/`。本项目使用 4.5.14；其他安装位置可设置 `BLENDER_BIN`：
-
-```powershell
-$env:BLENDER_BIN = 'E:\your-tools\blender.exe'
-npm run character:build
-```
-
-默认会查找 `.tools/blender/blender-4.5.14-windows-x64/blender.exe`。制作脚本生成独立眼球、头颈转轴和微笑／抬眉／轻张嘴形变，合并静态网格并校验 8 万三角面、8 MB 的上限。Blender 参考渲染留在私人素材目录；网站透明海报由 Playwright 调用同一个 Three.js 场景、相机和灯光生成，自动附带来源信息。重建海报需要本机已安装 Chrome（其他 Chromium 路径可设 `CHROME_BIN`），不会上传素材；普通站点构建不启动浏览器。生成素材后运行 `npm test`、`npm run docs:build`，并检查网页中性姿态、转头、海报衔接、资料卡和手机构图，再提交。
-
-性能目标是桌面接近 60 FPS，触屏交互上限 30 FPS，稳定中性姿态停止重复渲染。设备实际表现取决于显卡、分辨率和浏览器；自动化触屏模拟不等于物理手机的帧率验证。
-
 ## Docker 部署
 
 ```bash
