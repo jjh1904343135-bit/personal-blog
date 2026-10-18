@@ -57,10 +57,15 @@ const openSearch = (event) => {
       </header>
       <div class="category-grid">
         <a v-for="item in categories" :key="item.name" class="category-card" :href="withBase(item.path)">
-          <div class="category-card-top"><span class="category-sticker"><StickerIcon :name="item.key" /></span><span class="category-status" :class="{ 'is-empty': !categoryCount(item.name) }">{{ categoryCount(item.name) ? `${categoryCount(item.name)} 篇文章` : '暂未发布' }}</span></div>
-          <h3>{{ item.name }}</h3>
-          <p>{{ item.description }}</p>
-          <span class="category-meta">{{ categoryCount(item.name) ? '进入栏目' : '查看栏目介绍' }}<StickerIcon name="arrow" /></span>
+          <figure class="category-art">
+            <img :src="withBase(item.image)" :alt="item.imageAlt" width="960" height="600" loading="lazy" decoding="async">
+          </figure>
+          <div class="category-card-content">
+            <div class="category-card-top"><span class="category-sticker"><StickerIcon :name="item.key" /></span><span class="category-status" :class="{ 'is-empty': !categoryCount(item.name) }">{{ categoryCount(item.name) ? `${categoryCount(item.name)} 篇文章` : '暂未发布' }}</span></div>
+            <h3>{{ item.name }}</h3>
+            <p>{{ item.description }}</p>
+            <span class="category-meta">{{ categoryCount(item.name) ? '进入栏目' : '查看栏目介绍' }}<StickerIcon name="arrow" /></span>
+          </div>
         </a>
       </div>
     </section>

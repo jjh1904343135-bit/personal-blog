@@ -2,16 +2,19 @@
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vitepress'
 import { profile } from '../../../profile.js'
-import AboutPortrait from './AboutPortrait.vue'
 
 const router = useRouter()
 const page = ref(null)
 const hero = ref(null)
 const portrait = ref(null)
-const portraitMotion = ref(null)
 const modal = ref(null)
 const closeButton = ref(null)
 const isOpen = ref(false)
+const expression = ref('neutral')
+const expressionStates = ['neutral', 'left', 'right', 'up-left', 'up', 'up-right', 'down', 'down-left', 'down-right']
+let pendingExpression = 'neutral'
+let expressionChangedAt = 0
+let expressionTimer
 let opener
 let previousOverflow = ''
 const canvas = ref(null)
@@ -28,7 +31,6 @@ let canvasFrame = 0
 let canvasContext
 let ripples = []
 let lastRipple = 0
-let lastPointer = null
 let reduceMotion = false
 let coarsePointer = false
 
@@ -49,20 +51,29 @@ function updateEyes(event) {
   const centerY = rect.top + rect.height * .38
   const nx = clamp((event.clientX - centerX) / (window.innerWidth * .42), -1, 1)
   const ny = clamp((event.clientY - centerY) / (window.innerHeight * .5), -1, 1)
-  portraitMotion.value?.setTarget(nx, ny)
+  const horizontal = nx < -.18 ? 'left' : nx > .18 ? 'right' : ''
+  const vertical = ny < -.2 ? 'up' : ny > .26 ? 'down' : ''
+  const state = [vertical, horizontal].filter(Boolean).join('-') || 'neutral'
   const now = performance.now()
-  const distance = lastPointer ? Math.hypot(event.clientX - lastPointer.x, event.clientY - lastPointer.y) : Infinity
-  if (canvasContext && now - lastRipple > 18 && distance > 9) {
-    ripples.push({ x: event.clientX, y: event.clientY, born: now, life: 300, max: 19, alpha: .17 })
+  if (state !== pendingExpression) {
+    pendingExpression = state
+    expressionChangedAt = now
+    clearTimeout(expressionTimer)
+    expressionTimer = setTimeout(() => { expression.value = state }, 65)
+  }
+  // A short dwell prevents flicker when the pointer crosses sector boundaries.
+  if (state !== expression.value && now - expressionChangedAt >= 65) expression.value = state
+
+  if (canvasContext && now - lastRipple > 95) {
+    ripples.push({ x: event.clientX, y: event.clientY, born: now, life: 340, max: 28, alpha: .1 })
     lastRipple = now
-    lastPointer = { x: event.clientX, y: event.clientY }
-    startRippleFrame()
   }
 }
 
 function resetEyes() {
-  portraitMotion.value?.reset()
-  lastPointer = null
+  clearTimeout(expressionTimer)
+  expression.value = 'neutral'
+  pendingExpression = 'neutral'
 }
 
 function onScroll() {
@@ -76,7 +87,6 @@ function selectFolder(key) {
   document.body.style.overflow = 'hidden'
   isOpen.value = true
   resetEyes()
-  stopRipples()
   nextTick(() => closeButton.value?.focus())
 }
 
@@ -110,43 +120,28 @@ function resizeCanvas() {
 }
 
 function addClickRipple(event) {
-  if (!canvasContext || reduceMotion || coarsePointer || isOpen.value || !heroIsVisible()) return
-  ripples.push({ x: event.clientX, y: event.clientY, born: performance.now(), life: 460, max: 58, alpha: .26, click: true })
-  startRippleFrame()
-}
-
-function startRippleFrame() {
-  if (!canvasFrame && ripples.length && !document.hidden && heroIsVisible() && !isOpen.value) {
-    canvasFrame = requestAnimationFrame(drawRipples)
-  }
-}
-
-function stopRipples() {
-  cancelAnimationFrame(canvasFrame)
-  canvasFrame = 0
-  ripples = []
-  canvasContext?.clearRect(0, 0, window.innerWidth, window.innerHeight)
+  if (!canvasContext || reduceMotion || coarsePointer) return
+  ripples.push({ x: event.clientX, y: event.clientY, born: performance.now(), life: 430, max: 70, alpha: .3, click: true })
 }
 
 function drawRipples(now) {
-  canvasFrame = 0
-  if (!canvasContext || document.hidden || isOpen.value || !heroIsVisible()) { stopRipples(); return }
+  if (!canvasContext) return
   canvasContext.clearRect(0, 0, window.innerWidth, window.innerHeight)
   ripples = ripples.filter(item => now - item.born < item.life)
   for (const ripple of ripples) {
     const t = clamp((now - ripple.born) / ripple.life, 0, 1)
-    const eased = 1 - Math.pow(1 - t, 2)
-    const rings = ripple.click ? 2 : 3
+    const eased = 1 - Math.pow(1 - t, 3)
+    const rings = ripple.click ? 3 : 2
     for (let ring = 0; ring < rings; ring += 1) {
-      const delayed = clamp(t - ring * .09, 0, 1)
+      const delayed = clamp(t - ring * .08, 0, 1)
       canvasContext.beginPath()
-      canvasContext.arc(ripple.x, ripple.y, 2 + ripple.max * eased + ring * (ripple.click ? 4 : 2.5), 0, Math.PI * 2)
-      canvasContext.strokeStyle = `rgba(156, 185, 224, ${ripple.alpha * Math.pow(1 - delayed, 2)})`
-      canvasContext.lineWidth = ripple.click ? 1 : .65
+      canvasContext.arc(ripple.x, ripple.y, 6 + ripple.max * eased + ring * 6, 0, Math.PI * 2)
+      canvasContext.strokeStyle = `rgba(113, 137, 204, ${ripple.alpha * (1 - delayed)})`
+      canvasContext.lineWidth = ripple.click ? .9 : .6
       canvasContext.stroke()
     }
   }
-  startRippleFrame()
+  canvasFrame = requestAnimationFrame(drawRipples)
 }
 
 function goHome(event) {
@@ -163,6 +158,7 @@ onMounted(async () => {
   addEventListener('keydown', handleModalKey)
   if (!reduceMotion && !coarsePointer) {
     resizeCanvas()
+    canvasFrame = requestAnimationFrame(drawRipples)
   }
 })
 
@@ -172,7 +168,7 @@ onBeforeUnmount(() => {
   removeEventListener('keydown', handleModalKey)
   if (isOpen.value) document.body.style.overflow = previousOverflow
   cancelAnimationFrame(canvasFrame)
-  stopRipples()
+  clearTimeout(expressionTimer)
 })
 </script>
 
@@ -198,9 +194,9 @@ onBeforeUnmount(() => {
         <span>{{ profile.role }}</span>
       </div>
 
-      <div ref="portrait" class="portrait-stage" aria-label="根据鼠标方向展示原视频中的人物眼神和表情">
+      <div ref="portrait" class="portrait-stage" :data-expression="expression" aria-label="根据鼠标方向展示原视频中的人物眼神和表情">
         <div class="portrait-halo"></div>
-        <AboutPortrait ref="portraitMotion" />
+        <img v-for="state in expressionStates" :key="state" class="video-expression" :class="{ 'is-current': expression === state }" :src="`/images/about-expressions/${state}.webp`" :alt="state === 'neutral' ? '从原视频提取的俎嘉辉卡通人物' : ''" :aria-hidden="expression !== state" draggable="false">
         <span class="gaze-tip">移动鼠标<br>看看我的表情 ↗</span>
       </div>
 
@@ -306,8 +302,7 @@ onBeforeUnmount(() => {
 
 /* The four archive tickets trace a shallow arc above the video portrait. */
 .portfolio-hero{min-height:760px}
-.portrait-stage{bottom:-4%;left:50%;width:min(49vw,720px);transform:translateX(calc(-50% + var(--portrait-shift-x,0px))) perspective(900px) rotateY(var(--portrait-turn-y,0deg)) rotateX(var(--portrait-turn-x,0deg));transform-origin:50% 70%;will-change:transform}
-.portrait-stage .portrait-poster,.portrait-stage .portrait-motion{display:block}
+.portrait-stage{bottom:-4%;left:50%;width:min(49vw,720px);transform:translateX(-50%)}
 .ticket-experience{left:calc(50% - min(44vw,650px));top:clamp(175px,24vh,255px);transform:rotate(-8deg)}
 .ticket-projects{left:calc(50% - min(25vw,365px));top:clamp(100px,12vh,145px);transform:rotate(-3deg)}
 .ticket-skills{right:calc(50% - min(25vw,365px));top:clamp(100px,12vh,145px);transform:rotate(3deg)}

@@ -126,15 +126,24 @@ input { caret-color: var(--blog-accent); }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 42px; margin-bottom: 32px; }
 .section-heading h2 { margin: 0; font-size: clamp(2rem, 3vw, 3rem); line-height: 1.3; letter-spacing: -.03em; font-weight: 700; }
 .section-heading > p { max-width: 440px; margin: 0; color: var(--vp-c-text-2); font-size: 15px; line-height: 1.75; text-align: right; }
-.category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.5vw, 24px); }
-.category-card { display: flex; flex-direction: column; min-height: 254px; padding: 24px; border: 1px solid var(--vp-c-divider); border-radius: var(--blog-radius); color: var(--vp-c-text-1); background: var(--blog-panel); text-decoration: none; transition: border-color .2s var(--blog-ease), background .2s var(--blog-ease); }
-.category-card:hover { border-color: var(--blog-accent); background: #232d3d; }
-.category-card:active { background: #2b3649; }
+.category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 2vw, 34px); padding: 18px 10px 30px; perspective: 1400px; }
+.category-card { --card-accent: #86a8ff; --fan-angle: -1.7deg; --fan-y: 8px; position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 468px; overflow: hidden; border: 2px solid var(--card-accent); border-radius: 22px; color: var(--vp-c-text-1); background: #1a2230; box-shadow: 0 20px 38px rgba(0, 0, 0, .32), 0 0 22px color-mix(in srgb, var(--card-accent) 16%, transparent); text-decoration: none; transform: translateY(var(--fan-y)) rotate(var(--fan-angle)); transform-origin: 50% 110%; transform-style: preserve-3d; transition: transform .38s var(--blog-ease), box-shadow .38s var(--blog-ease), border-color .2s ease; }
+.category-card:nth-child(2) { --card-accent: #ff7f77; --fan-angle: 0deg; --fan-y: 0px; }
+.category-card:nth-child(3) { --card-accent: #79c8bd; --fan-angle: 1.7deg; --fan-y: 8px; }
+.category-card:nth-child(4) { --card-accent: #ff9d55; --fan-angle: -1.7deg; --fan-y: 8px; }
+.category-card:nth-child(5) { --card-accent: #9f8cff; --fan-angle: 0deg; --fan-y: 0px; }
+.category-card:nth-child(6) { --card-accent: #55d7d0; --fan-angle: 1.7deg; --fan-y: 8px; }
+.category-card:hover, .category-card:focus-visible { z-index: 5; border-color: #eef0f4; box-shadow: 0 34px 70px rgba(0, 0, 0, .5), 0 0 34px color-mix(in srgb, var(--card-accent) 38%, transparent); transform: translateY(-18px) rotate(0deg) scale(1.035); }
+.category-card:active { transform: translateY(-10px) rotate(0deg) scale(1.015); }
+.category-art { position: relative; flex: 0 0 auto; aspect-ratio: 8 / 5; margin: 0; overflow: hidden; border-bottom: 1px solid color-mix(in srgb, var(--card-accent) 55%, transparent); background: #101621; }
+.category-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 -28px 42px rgba(7, 10, 16, .2), inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.category-art img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .48s var(--blog-ease), filter .48s var(--blog-ease); }
+.category-card:hover .category-art img, .category-card:focus-visible .category-art img { filter: saturate(1.08) brightness(1.04); transform: scale(1.045) translateY(-1%); }
+.category-card-content { display: flex; flex: 1; flex-direction: column; padding: 20px 24px 24px; }
 .category-card-top { display: flex; justify-content: space-between; align-items: center; }
-.category-sticker { display: grid; place-items: center; width: 48px; height: 44px; border: 3px solid #eef0f4; border-radius: 13px; color: var(--blog-ink); background: var(--blog-accent); transform: rotate(-7deg); transition: transform .2s var(--blog-ease); }
+.category-sticker { display: grid; place-items: center; width: 48px; height: 44px; border: 3px solid #eef0f4; border-radius: 13px; color: var(--blog-ink); background: var(--card-accent); box-shadow: 0 8px 18px color-mix(in srgb, var(--card-accent) 35%, transparent); transform: rotate(-7deg); transition: transform .2s var(--blog-ease); }
 .category-sticker svg { width: 26px; height: 26px; }
-.category-card:nth-child(2n) .category-sticker { background: var(--blog-accent-2); transform: rotate(7deg); }
-.category-card:nth-child(3n) .category-sticker { background: var(--blog-mint); }
+.category-card:nth-child(2n) .category-sticker { transform: rotate(7deg); }
 .category-card:hover .category-sticker { transform: rotate(0); }
 .category-status { color: var(--blog-mint); font-size: 12px; font-variant-numeric: tabular-nums; }
 .category-status.is-empty { color: var(--vp-c-text-2); }
@@ -177,7 +186,8 @@ input { caret-color: var(--blog-accent); }
   .home-brand { margin-right: auto; }
   .home-nav nav { order: 3; flex-basis: 100%; justify-content: space-between; margin: 0; padding-top: 6px; border-top: 1px solid var(--vp-c-divider); }
   .intro-section { grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 28px; }
-  .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-inline: 0; }
+  .category-card { --fan-angle: 0deg; --fan-y: 0px; }
 }
 
 @media (max-width: 760px) {
@@ -202,7 +212,9 @@ input { caret-color: var(--blog-accent); }
   .section-heading h2 { font-size: 1.9rem; }
   .section-heading > p { margin-top: 14px; text-align: left; }
   .category-grid { grid-template-columns: minmax(0, 1fr); }
-  .category-card { min-height: 224px; padding: 20px; }
+  .category-card { min-height: 0; border-radius: 18px; transform: none; }
+  .category-card:hover, .category-card:focus-visible { transform: translateY(-6px); }
+  .category-card-content { padding: 18px 20px 20px; }
   .category-card h3 { font-size: 1.5rem; }
   .category-meta { padding-top: 20px; }
   .author-strip { align-items: flex-start; flex-direction: column; gap: 24px; margin: 48px 18px 0; }
@@ -219,4 +231,6 @@ input { caret-color: var(--blog-accent); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .category-card, .category-card:hover, .category-card:focus-visible, .category-card:active { transform: none; }
+  .category-card:hover .category-art img, .category-card:focus-visible .category-art img { transform: none; }
 }
