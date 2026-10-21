@@ -10,20 +10,28 @@
     "admin": "node scripts/author-server.js",
     "write": "node scripts/author-server.js",
     "editor:build": "node scripts/build-editor.js",
+    "remote:build": "node scripts/build-remote-write.js",
     "preadmin": "npm run editor:build",
     "prewrite": "npm run editor:build",
     "sync": "node scripts/sync-content.js",
     "sync:watch": "node scripts/sync-content.js --watch",
-    "test": "node --test scripts/*.test.js",
+    "test": "node --test --test-concurrency=1 scripts/*.test.js",
     "gen-img": "node scripts/generate-image.js"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.5",
+    "@netlify/database": "^2.0.1",
+    "@netlify/functions": "^6.0.3",
+    "@netlify/identity": "^2.0.0",
     "dotenv": "^16.4.7",
+    "fflate": "^0.8.3",
     "gray-matter": "^4.0.3",
     "markdown-it": "^15.0.2",
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@netlify/database-dev": "^1.0.1",
     "@tiptap/core": "^3.31.4",
     "@tiptap/extension-code-block-lowlight": "^3.31.4",
     "@tiptap/extension-image": "^3.31.4",
@@ -45,6 +53,6 @@
     }
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   }
 }

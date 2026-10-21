@@ -60,7 +60,7 @@ export default defineConfig({
     ],
     sidebar,
     outline: { level: [2, 3], label: '本页目录' },
-    search: {
+    search: process.env.VITE_CONTENT_MODE === 'remote' ? undefined : {
       provider: 'local',
       options: {
         detailedView: true,

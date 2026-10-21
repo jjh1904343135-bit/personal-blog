@@ -1,10 +1,12 @@
 <script setup>
 import { defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import StickerIcon from './StickerIcon.vue'
+import RemoteSearch from './RemoteSearch.vue'
 
 // Reuse VitePress's indexed search, result navigation and focus trap, not a
 // second title-only search. This adapter owns trigger-focus restoration.
 const LocalSearchBox = defineAsyncComponent(() => import('vitepress/dist/client/theme-default/components/VPLocalSearchBox.vue'))
+const remote = import.meta.env.VITE_CONTENT_MODE === 'remote'
 const isOpen = ref(false)
 const button = ref(null)
 let opener
@@ -45,6 +47,7 @@ defineExpose({ open })
 <template>
   <div class="home-fulltext-search">
     <button ref="button" class="nav-search" type="button" aria-label="搜索文章全文" @click="open($event.currentTarget)"><StickerIcon name="search" /><span>搜索文章</span></button>
-    <LocalSearchBox v-if="isOpen" @close="close" />
+    <RemoteSearch v-if="isOpen && remote" @close="close" />
+    <LocalSearchBox v-else-if="isOpen" @close="close" />
   </div>
 </template>

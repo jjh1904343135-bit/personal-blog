@@ -1,17 +1,34 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { withBase } from 'vitepress'
 import { data as posts } from '../../../posts.data.js'
 import { categories } from '../../../categories.js'
 import StickerIcon from './StickerIcon.vue'
 import BlogSearch from './BlogSearch.vue'
 
-const categoryCount = (name) => posts.filter((post) => post.category === name).length
+const remote = import.meta.env.VITE_CONTENT_MODE === 'remote'
+const visiblePosts = ref(remote ? [] : posts)
+const loaded = ref(!remote)
+const failed = ref(false)
+const categoryCount = (name) => visiblePosts.value.filter((post) => post.category === name).length
 const search = ref(null)
-const readingRoutes = computed(() => ['Agent', '算法', '部署'].map((name) => posts.find((post) => post.category === name)).filter(Boolean))
+const readingRoutes = computed(() => ['Agent', '算法', '部署'].map((name) => visiblePosts.value.find((post) => post.category === name)).filter(Boolean))
 const openSearch = (event) => {
   search.value?.open(event.currentTarget)
 }
+onMounted(async () => {
+  if (/^#(?:invite_token|recovery_token|confirmation_token|email_change_token)=/.test(window.location.hash)) {
+    window.location.replace(`/write/${window.location.hash}`)
+    return
+  }
+  if (!remote) return
+  try {
+    const response = await fetch('/api/posts', { cache: 'no-store' })
+    if (!response.ok) throw new Error('文章列表暂不可用')
+    visiblePosts.value = await response.json()
+  } catch { failed.value = true }
+  finally { loaded.value = true }
+})
 </script>
 
 <template>
@@ -42,7 +59,8 @@ const openSearch = (event) => {
           <a class="primary-action" href="#knowledge-topics">浏览六个栏目 <StickerIcon name="arrow" /></a>
           <button class="secondary-action search-action" type="button" @click="openSearch"><StickerIcon name="search" /> 搜索文章 <kbd>Ctrl K</kbd></button>
         </div>
-        <p class="hero-footnote">{{ posts.length }} 篇公开文章，按主题整理，随时翻阅。</p>
+        <p v-if="loaded && !failed" class="hero-footnote">{{ visiblePosts.length }} 篇公开文章，按主题整理，随时翻阅。</p>
+        <p v-else-if="failed" class="hero-footnote">文章列表暂时无法加载，请稍后刷新。</p>
       </div>
       <aside v-if="readingRoutes.length" class="hero-signal" aria-labelledby="reading-routes-title">
         <h2 id="reading-routes-title">不妨从一个问题开始</h2>
@@ -61,7 +79,7 @@ const openSearch = (event) => {
             <img :src="withBase(item.image)" :alt="item.imageAlt" width="960" height="600" loading="lazy" decoding="async">
           </figure>
           <div class="category-card-content">
-            <div class="category-card-top"><span class="category-sticker"><StickerIcon :name="item.key" /></span><span class="category-status" :class="{ 'is-empty': !categoryCount(item.name) }">{{ categoryCount(item.name) ? `${categoryCount(item.name)} 篇文章` : '暂未发布' }}</span></div>
+            <div class="category-card-top"><span class="category-sticker"><StickerIcon :name="item.key" /></span><span class="category-status" :class="{ 'is-empty': loaded && !categoryCount(item.name) }">{{ failed ? '稍后重试' : !loaded ? '正在读取' : categoryCount(item.name) ? `${categoryCount(item.name)} 篇文章` : '暂未发布' }}</span></div>
             <h3>{{ item.name }}</h3>
             <p>{{ item.description }}</p>
             <span class="category-meta">{{ categoryCount(item.name) ? '进入栏目' : '查看栏目介绍' }}<StickerIcon name="arrow" /></span>

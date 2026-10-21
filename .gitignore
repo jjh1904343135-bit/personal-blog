@@ -4,6 +4,7 @@ private/data/
 private/admin/assets/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+docs/public/write/
 .env
 .env.*
 !.env.example

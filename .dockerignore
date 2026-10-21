@@ -5,6 +5,7 @@ person
 .impeccable
 docs/.vitepress/cache
 docs/.vitepress/dist
+docs/public/write
 .git
 .env
 .vercel
