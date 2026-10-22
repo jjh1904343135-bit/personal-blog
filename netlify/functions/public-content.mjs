@@ -89,5 +89,14 @@ export default async function publicContent(req) {
 }
 
 export const config = {
-  path: ['/api/posts', '/api/search', '/sitemap.xml', ...categories.flatMap(({ key }) => [`/${key}`, `/${key}/`, `/${key}/:slug`])],
+  // Netlify reads this statically while bundling; computed paths are not supported here.
+  path: [
+    '/api/posts', '/api/search', '/sitemap.xml',
+    '/algorithms', '/algorithms/', '/algorithms/:slug',
+    '/agent', '/agent/', '/agent/:slug',
+    '/interviews', '/interviews/', '/interviews/:slug',
+    '/deployment', '/deployment/', '/deployment/:slug',
+    '/systems', '/systems/', '/systems/:slug',
+    '/backend', '/backend/', '/backend/:slug',
+  ],
 }

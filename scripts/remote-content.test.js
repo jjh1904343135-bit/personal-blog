@@ -1,11 +1,25 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { zipSync, strToU8 } from 'fflate'
 import { parseMarkdown, parseImport, inspectZip } from '../private/remote-write/import-markdown.js'
 import { categoryByKey, metadata, validateNote, mediaIds, escapeHtml } from '../netlify/lib/shared.mjs'
+import { config as publicContentConfig } from '../netlify/functions/public-content.mjs'
 
 test('all six categories remain available', () => {
   assert.deepEqual([...categoryByKey.keys()], ['algorithms', 'agent', 'interviews', 'deployment', 'systems', 'backend'])
+})
+
+test('public function routes are literal and cover all six categories', () => {
+  const source = readFileSync(new URL('../netlify/functions/public-content.mjs', import.meta.url), 'utf8')
+  const configSource = source.slice(source.lastIndexOf('export const config ='))
+  assert.match(configSource, /path:\s*\[/)
+  assert.doesNotMatch(configSource, /\.\.\.|\.map\(|\.flatMap\(/)
+  for (const key of categoryByKey.keys()) {
+    assert.ok(publicContentConfig.path.includes(`/${key}`))
+    assert.ok(publicContentConfig.path.includes(`/${key}/`))
+    assert.ok(publicContentConfig.path.includes(`/${key}/:slug`))
+  }
 })
 
 test('plain Markdown import reads frontmatter and never marks published', () => {
